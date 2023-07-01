@@ -1,0 +1,1100 @@
+# Packages, in (rough) dependency order
+STAGE3_PACKAGES=("ISOCODES" "FILESYSTEM" "TCSH" "SETUP" "BASESYSTEM" "BZIP2"
+ "LIBXML2" "GETTEXT" "COREUTILS" "LIBTOOL" "BASH" "MAKE" "KERNEL" "GLIBC"
+ "NANO" "CPIO" "DOS2UNIX" "SWIG" "GMP" "MPFR" "LIBMPC" "ELFUTILS" "BINUTILS"
+ "GCC" "DIFFUTILS" "LIBXSLT" "GDBM" "CHRPATH" "TCL" "LIBDB" "PROCPS_NG" "PERL"
+ "PERL_FEDORA_VSP" "LESS" "PERL_GENERATORS" "TEXINFO" "LIBCAP"
+ "REDHAT_RPM_CONFIG" "RPM" "AUTOCONF" "AUTOMAKE" "BASH_COMPLETION"
+ "LKSCTP_TOOLS" "OPENSSL" "PYTHON_RPM_MACROS" "PYTHON_SETUPTOOLS"
+ "PYTHON_WHEEL" "PYTHON_PIP" "PYTHON" "PYTEST" "PYTHON_ATTRS" "PYTHON_PY"
+ "PYPROJECT_RPM_MACROS" "PYTHON_INICONFIG" "PYTHON_TOML" "PYTHON_PACKAGING"
+ "PYTHON_RPM_GENERATORS" "PYTHON_PLUGGY" "PYTHON_DISTRO" "PYTHON_MARKUPSAFE"
+ "PYTZ" "BABEL" "PYTHON_JINJA2" "PYTHON_PYROUTE2" "PYTHON_REQUESTS"
+ "PYTHON_SETUPTOOLS_WHEEL" "PYPARSING" "PYTHON_TEMPLATED_DICTIONARY"
+ "LIBGPG_ERROR" "LIBASSUAN" "LIBGCRYPT" "LIBKSBA" "GNUPG2" "LIBKCAPI"
+ "LIBXCRYPT" "NETTLE" "MESON" "GLIB2" "BABELTRACE" "GDB" "VALGRIND" "SYSTEMD"
+ "CMAKE" "GPGME" "ATTR" "ACL" "SHARUTILS" "LIBCAP_NG" "BROTLI" "LIBEVENT"
+ "LIBFFI" "LIBSEPOL" "MULTILIB_RPM_CONFIG" "LIBYAML" "RUBY" "POPT" "PCRE"
+ "PCRE2" "GPM" "NCURSES" "READLINE" "NPTH" "LZ4" "XZ" "ZLIB" "UNZIP" "SQLITE"
+ "LIBSELINUX" "SED" "EXECSTACK" "ZSTD" "CCACHE" "LUA" "LIBUNISTRING" "LIBSIGSEGV" "GREP"
+ "WORDS" "CRACKLIB" "PKGCONF" "UNIXODBC" "M4" "BISON" "HELP2MAN" "LIBSOLV"
+ "FLEX" "JSON_C" "KEYUTILS" "LIBTASN1" "P11_KIT" "SLANG" "NEWT" "BEAKERLIB"
+ "ALMALINUX_RELEASE" "CHKCONFIG" "LIBEV" "LIBVERTO" "GZIP" "DOCBOOK_STYLE_XSL"
+ "XMLTO" "EXPAT" "LIBEDIT" "LMDB" "FUSE" "E2FSPROGS" "KRB5" "NSS_WRAPPER"
+ "SOCKET_WRAPPER" "CYRUS_SASL" "OPENLDAP" "PATCHUTILS" "CHECK" "LIBCOMPS"
+ "RUBYGEM_ASCIIDOCTOR" "AUDIT" "LIBSEMANAGE" "FILE" "LIBARCHIVE" "ICU"
+ "LIBIDN2" "PUBLICSUFFIX_LIST" "LIBPSL" "PUBLICSUFFIX_LIST_DAFSA" "LIBUSER"
+ "LIBUTEMPTER" "UTIL_LINUX" "C_ARES" "CUNIT" "LIBEVENT" "NGHTTP2" "OPENSSH"
+ "LIBSSH" "GNUTLS" "CURL" "LIBSOLV" "PYXATTR" "PYTHON_SIX" "PYTHON_URLLIB3"
+ "PYTHON_CHARDET" "PYTHON_IDNA" "PYTHON_PYGMENTS" "LIBREPO" "ITSTOOL"
+ "SHADOW_UTILS" "GTK_DOC" "PYTHON_MAKO" "CYTHON" "PYYAML" "PYTHON_MARKDOWN"
+ "MARSHALPARSER" "GOBJECT_INTROSPECTION" "PYGOBJECT3" "LIBMODULEMD" "CPPUNIT"
+ "LIBDNF" "PYTHON_SYSTEMD" "DNF" "ED" "PATCH" "AUTOCONF_ARCHIVE" "DBUS"
+ "DBUS_PYTHON" "AUGEAS" "GPERF" "SATYR" "CA_CERTIFICATES" "DNF_PLUGINS_CORE"
+ "XMLRPC_C" "PERL_CAPTURE_TINY" "PERL_DEVEL_CHECKLIB" "PERL_SRPM_MACROS"
+ "ANNOBIN" "FINDUTILS" "PERL_ERROR" "GIT" "PERL_XML_PARSER" "INTLTOOL"
+ "LIBREPORT" "GAWK" "WHICH" "PERL_FILE_WHICH" "PERL_FILE_PUSHD" "TZDATA"
+ "CRYPTO_POLICIES" "PYTHON_DATEUTIL" "DWZ" "CREATEREPO_C" "NCOMPRESS" "PIGZ"
+ "POLICYCOREUTILS" "TAR" "USERMODE" "PAM" "PASSWD" "ZIP"
+ "NINJA_BUILD" "LLVM" "MOCK" "MOCK_CORE_CONFIGS" "MOCK_CENTOS_SIG_CONFIGS"
+ "DISTRIBUTION_GPG_KEYS"
+)
+
+# Packages to rebuild at the end to capture dependencies that couldn't be obtained
+# during the first pass due to missing bits of RPM.
+#  - binary packages before and including 'elfutils'
+#  - Perl packages before and including 'perl-generators'
+#  - Python packages before and including 'python-rpm-generators'
+STAGE3_REBUILD_PACKAGES=("PERL" "PERL_FEDORA_VSP" "PERL_GENERATORS"
+ "PYTHON_RPM_MACROS" "PYTHON_SETUPTOOLS" "PYTHON_WHEEL" "PYTHON_PIP" "PYTHON"
+ "PYTEST" "PYTHON_ATTRS" "PYTHON_PY" "PYPROJECT_RPM_MACROS" "PYTHON_INICONFIG"
+ "PYTHON_TOML" "PYTHON_PACKAGING" "PYTHON_RPM_GENERATORS"
+)
+
+
+ISOCODES_RPMNAME='iso-codes'
+ISOCODES_VERSION='4.6.0'
+ISOCODES_RPMBUILD='rpmbuild -bb --clean --nodeps --nodebuginfo'
+ISOCODES_INSTALL_PACKAGES='iso-codes*'
+
+FILESYSTEM_VERSION='3.16'
+FILESYSTEM_RPMBUILD='rpmbuild -bb --clean --nodebuginfo'
+FILESYSTEM_INSTALL_PACKAGES='filesystem*'
+
+TCSH_VERSION='6.22'
+TCSH_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' --undefine '%_annobin_gcc_plugin' --nodebuginfo --clean --nodeps --nocheck'
+TCSH_INSTALL_PACKAGES='tcsh*'
+
+SETUP_VERSION='2.13'
+SETUP_RPMBUILD='rpmbuild -D "%_tmpfilesdir /usr/lib/tmpfiles.d" -bb --nodebuginfo --nodeps --clean'
+SETUP_INSTALL_PACKAGES='setup*'
+
+BASESYSTEM_VERSION='11'
+BASESYSTEM_PRE_RPMBUILD_CMD='cp ${SCRIPT_DIR}/stage3/os-release /etc'
+BASESYSTEM_RPMBUILD='rpmbuild -bb --nodebuginfo --nodeps --clean'
+BASESYSTEM_INSTALL_PACKAGES='basesystem*'
+
+BZIP2_VERSION='1.0.8'
+BZIP2_RPMBUILD='rpmbuild --undefine "%_annotated_build" -bb --nodebuginfo --nodeps --clean'
+BZIP2_INSTALL_PACKAGES='bzip2*'
+BZIP2_EXCLUDE_PACKAGES='bzip2-static*'
+
+LIBXML2_VERSION='2.9.13'
+LIBXML2_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' -D "%__python3 /usr/bin/python3" -D "%python3_sitearch /usr/lib/python3.9/site-packages" --clean --nodeps --nodebuginfo'
+LIBXML2_INSTALL_PACKAGES='libxml2* python3-libxml2*'
+
+GETTEXT_VERSION='0.21'
+GETTEXT_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/gettext.spec ${RPMBUILD_TOPDIR}/SPECS'
+GETTEXT_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' -D "%_emacs_version 27.2" -D "%_emacs_sitelispdir /usr/share/emacs/site-lisp" -D "%_emacs_sitestartdir /usr/share/emacs/site-lisp/site-start.d" --nocheck --nodeps --nodebuginfo --clean'
+GETTEXT_INSTALL_PACKAGES='gettext*'
+
+COREUTILS_VERSION='8.32'
+COREUTILS_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/coreutils.spec ${RPMBUILD_TOPDIR}/SPECS'
+COREUTILS_RPMBUILD='rpmbuild --undefine '%_annotated_build' -bb --nodebuginfo --clean --nodeps --nocheck'
+COREUTILS_INSTALL_PACKAGES='coreutils*'
+COREUTILS_EXCLUDE_PACKAGES='coreutils-single*'
+
+LIBTOOL_VERSION='2.4.6'
+LIBTOOL_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' --nodebuginfo --nodeps --clean --nocheck'
+LIBTOOL_INSTALL_PACKAGES='libtool*'
+
+BASH_VERSION='5.1.8'
+BASH_RPMBUILD='rpmbuild -bb --undefine %_annotated_build --nodebuginfo --nodeps --clean'
+BASH_INSTALL_PACKAGES='bash*'
+
+GLIBC_VERSION='2.34'
+GLIBC_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/glibc.spec ${RPMBUILD_TOPDIR}/SPECS'
+GLIBC_RPMBUILD='rpmbuild --undefine '%_annotated_build' -D "%_tmpfilesdir /usr/lib/tmpfiles.d" -bb --clean --nodebuginfo --nodeps --with bootstrap --nocheck'
+GLIBC_INSTALL_PACKAGES='glibc* nscd* nss_db* nss_hesiod*'
+
+NANO_VERSION='5.6.1'
+NANO_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/nano.spec ${RPMBUILD_TOPDIR}/SPECS'
+NANO_RPMBUILD='rpmbuild --undefine '%_annotated_build' -bb --nodebuginfo --nodeps --clean'
+NANO_INSTALL_PACKAGES='nano*'
+
+CPIO_VERSION='2.13'
+CPIO_RPMBUILD='rpmbuild --undefine '%_annotated_build' -bb --nodebuginfo --nodeps --clean'
+CPIO_INSTALL_PACKAGES='cpio*'
+
+DOS2UNIX_VERSION='7.4.2'
+DOS2UNIX_RPMBUILD='rpmbuild --undefine '%_annotated_build' -bb --nodebuginfo --nodeps --clean'
+DOS2UNIX_INSTALL_PACKAGES='dos2unix*'
+
+SWIG_VERSION='4.0.2'
+SWIG_RPMBUILD='rpmbuild --undefine %_annotated_build --nodebuginfo --clean --nodeps -bb --without testsuite --without build_ccache_swig'
+SWIG_INSTALL_PACKAGES='swig*'
+
+GMP_VERSION='6.2.0'
+GMP_RPMBUILD='rpmbuild --undefine %_annotated_build --nodebuginfo --clean --nodeps -bb --without fips'
+GMP_INSTALL_PACKAGES='gmp*'
+
+MPFR_VERSION='4.1.0'
+MPFR_RPMBUILD='rpmbuild --undefine %_annotated_build --nodebuginfo --clean --nodeps -bb --nocheck'
+MPFR_INSTALL_PACKAGES='mpfr*'
+
+LIBMPC_VERSION='1.2.1'
+LIBMPC_RPMBUILD='rpmbuild --undefine %_annotated_build --nodebuginfo --clean --nodeps -bb --nocheck'
+LIBMPC_INSTALL_PACKAGES='libmpc*'
+
+ELFUTILS_VERSION='0.187'
+ELFUTILS_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/elfutils.spec ${RPMBUILD_TOPDIR}/SPECS'
+ELFUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodeps --clean --nodebuginfo'
+ELFUTILS_INSTALL_PACKAGES='elfutils*'
+
+BINUTILS_VERSION='2.35'
+BINUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build --nodebuginfo --clean --nodeps -bb --with bootstrap --without debuginfod --without docs'
+BINUTILS_INSTALL_PACKAGES='binutils*'
+
+GCC_VERSION='11.3'
+# HACK: recreate ld symlink because binutils installation breaks it
+#       (but the annobin stuff needs to be here)
+GCC_PRE_RPMBUILD_CMD='ln -sf /usr/bin/ld.bfd /usr/bin/ld && rpm -ivh $SRPM_REPO_DIR/annobin*src.rpm && mkdir -p /usr/src/annobin && cp $RPMBUILD_TOPDIR/SOURCES/annobin*tar.xz /usr/src/annobin/latest-annobin.tar.xz && cp ${STAGE3_SPECFILE_DIR}/gcc.spec ${RPMBUILD_TOPDIR}/SPECS'
+GCC_RPMBUILD='rpmbuild --undefine %_annotated_build --define "%__python3 /usr/bin/python3" -bb --nodebuginfo --clean --nodeps --nocheck' 
+GCC_INSTALL_PACKAGES='gcc-* cpp* libasan* libatomic* libgcc* libgfortran* libgomp* libitm* libstdc++* libubsan*'
+
+MAKE_VERSION='4.3'
+MAKE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+MAKE_INSTALL_PACKAGES='make*'
+
+DIFFUTILS_VERSION='3.7'
+DIFFUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+DIFFUTILS_INSTALL_PACKAGES='diffutils*'
+
+LIBXSLT_VERSION='1.1.34'
+LIBXSLT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LIBXSLT_INSTALL_PACKAGES='libxslt*'
+
+GDBM_VERSION='1.19'
+GDBM_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+GDBM_INSTALL_PACKAGES='gdbm*'
+
+CHRPATH_VERSION='0.16'
+CHRPATH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+CHRPATH_INSTALL_PACKAGES='chrpath*'
+
+TCL_VERSION='8.6'
+TCL_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/tcl.spec ${RPMBUILD_TOPDIR}/SPECS'
+TCL_RPMBUILD='rpmbuild --undefine %_annotated_build --define "%_without_check 1" -bb --nodebuginfo --clean --nodeps' 
+TCL_INSTALL_PACKAGES='tcl*'
+
+LIBDB_VERSION='5.3.28'
+LIBDB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LIBDB_INSTALL_PACKAGES='libdb*'
+
+PROCPS_NG_RPMNAME='procps-ng'
+PROCPS_NG_VERSION='3.3.17'
+PROCPS_NG_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/procps-ng.spec ${RPMBUILD_TOPDIR}/SPECS'
+PROCPS_NG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+PROCPS_NG_INSTALL_PACKAGES='procps*'
+
+PERL_VERSION='5.32.1'
+PERL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --define "%perl_bootstrap 1" --without perl_enables_systemtap --without perl_enables_groff --nodebuginfo --clean --nodeps' 
+PERL_INSTALL_PACKAGES='perl*'
+
+LESS_VERSION='590'
+LESS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LESS_INSTALL_PACKAGES='less*'
+
+PERL_FEDORA_VSP_RPMNAME='perl-Fedora-VSP'
+PERL_FEDORA_VSP_VERSION='0.001'
+PERL_FEDORA_VSP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+PERL_FEDORA_VSP_INSTALL_PACKAGES='perl-Fedora-VSP*'
+
+PERL_GENERATORS_RPMNAME='perl-generators'
+PERL_GENERATORS_VERSION='1.11'
+PERL_GENERATORS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+PERL_GENERATORS_INSTALL_PACKAGES='perl-generators*'
+
+TEXINFO_VERSION='6.7'
+TEXINFO_PRE_RPMBUILD_CMD='cp ${STAGE3_SPECFILE_DIR}/texinfo.spec ${RPMBUILD_TOPDIR}/SPECS'
+TEXINFO_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+TEXINFO_INSTALL_PACKAGES='texinfo* info*'
+
+LIBCAP_VERSION='2.48'
+LIBCAP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LIBCAP_INSTALL_PACKAGES='libcap*'
+
+REDHAT_RPM_CONFIG_RPMNAME='redhat-rpm-config'
+REDHAT_RPM_CONFIG_VERSION='196'
+REDHAT_RPM_CONFIG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+REDHAT_RPM_CONFIG_INSTALL_PACKAGES='redhat-rpm-config*'
+
+RPM_VERSION='4.16'
+RPM_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --without plugins --without libimaevm --nodebuginfo --clean --nodeps' 
+RPM_INSTALL_PACKAGES='rpm* python3-rpm*'
+
+AUTOCONF_VERSION='2.69'
+AUTOCONF_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --without autoconf_enables_emacs --nocheck --nodebuginfo --clean --nodeps' 
+AUTOCONF_INSTALL_PACKAGES='autoconf*'
+
+AUTOMAKE_VERSION='1.16'
+AUTOMAKE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nocheck --nodebuginfo --clean --nodeps' 
+AUTOMAKE_INSTALL_PACKAGES='automake*'
+
+LKSCTP_TOOLS_RPMNAME='lksctp-tools'
+LKSCTP_TOOLS_VERSION='1.0.19'
+LKSCTP_TOOLS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LKSCTP_TOOLS_INSTALL_PACKAGES='lksctp-tools*'
+
+OPENSSL_VERSION='3.0.1'
+OPENSSL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+OPENSSL_INSTALL_PACKAGES='openssl*'
+
+LIBTASN1_VERSION='4.16.0'
+LIBTASN1_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LIBTASN1_INSTALL_PACKAGES='libtasn1*'
+
+PYTHON_SETUPTOOLS_RPMNAME='python-setuptools'
+PYTHON_SETUPTOOLS_VERSION='53.0.0'
+PYTHON_SETUPTOOLS_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' --undefine '%_annobin_gcc_plugin' --with bootstrap --nodebuginfo --clean --nodeps --nocheck'
+PYTHON_SETUPTOOLS_INSTALL_PACKAGES='python3-setuptools*'
+
+PYTHON_SETUPTOOLS_WHEEL_RPMNAME='python-setuptools'
+PYTHON_SETUPTOOLS_WHEEL_VERSION='53.0.0'
+PYTHON_SETUPTOOLS_WHEEL_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' --undefine '%_annobin_gcc_plugin' --clean --nocheck'
+PYTHON_SETUPTOOLS_WHEEL_INSTALL_PACKAGES='python3-setuptools-wheel*'
+
+PYTHON_WHEEL_RPMNAME='python-wheel'
+PYTHON_WHEEL_VERSION='0.36'
+PYTHON_WHEEL_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' --undefine '%_annobin_gcc_plugin' --nodebuginfo --clean --nodeps --nocheck'
+PYTHON_WHEEL_INSTALL_PACKAGES='python3-wheel*'
+
+PYTHON_PIP_RPMNAME='python-pip'
+PYTHON_PIP_VERSION='21.2.3'
+PYTHON_PIP_RPMBUILD='rpmbuild -bb --undefine '%_annotated_build' --undefine '%_annobin_gcc_plugin' --nodebuginfo --clean --nodeps --nocheck'
+PYTHON_PIP_INSTALL_PACKAGES='python3-pip*'
+
+PYTHON_RPM_MACROS_RPMNAME='python-rpm-macros'
+PYTHON_RPM_MACROS_VERSION='3.9'
+PYTHON_RPM_MACROS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+PYTHON_RPM_MACROS_INSTALL_PACKAGES='python-rpm-macros* python3-rpm-macros* python-srpm-macros*'
+
+PYTHON_RPMNAME='python3.9'
+PYTHON_VERSION='3.9.14'
+PYTHON_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without debug_build --without tests --without gdb_hooks --without valgrind'
+PYTHON_INSTALL_PACKAGES='python3-3.9* python-unversioned-command* python3-devel* python3-libs* python3-test*'
+
+PYTEST_VERSION='6.2.2'
+PYTEST_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTEST_INSTALL_PACKAGES='python3-pytest*'
+
+PYTHON_ATTRS_RPMNAME='python-attrs'
+PYTHON_ATTRS_VERSION='20.3.0'
+PYTHON_ATTRS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_ATTRS_INSTALL_PACKAGES='python3-attrs*'
+
+PYTHON_PY_RPMNAME='python-py'
+PYTHON_PY_VERSION='1.10.0'
+PYTHON_PY_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without docs'
+PYTHON_PY_INSTALL_PACKAGES='python3-py-*'
+
+PYPROJECT_RPM_MACROS_RPMNAME='pyproject-rpm-macros'
+PYPROJECT_RPM_MACROS_VERSION='1.3.3'
+PYPROJECT_RPM_MACROS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb'
+PYPROJECT_RPM_MACROS_INSTALL_PACKAGES='pyproject-rpm-macros*'
+
+PYTHON_INICONFIG_RPMNAME='python-iniconfig'
+PYTHON_INICONFIG_VERSION='1.1.1'
+PYTHON_INICONFIG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodeps'
+PYTHON_INICONFIG_INSTALL_PACKAGES='python3-iniconfig*'
+
+PYTHON_TOML_RPMNAME='python-toml'
+PYTHON_TOML_VERSION='0.10.2'
+PYTHON_TOML_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodeps'
+PYTHON_TOML_INSTALL_PACKAGES='python3-toml*'
+
+PYTHON_PACKAGING_RPMNAME='python-packaging'
+PYTHON_PACKAGING_VERSION='20.9'
+PYTHON_PACKAGING_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodeps --without docs'
+PYTHON_PACKAGING_INSTALL_PACKAGES='python3-packaging*'
+
+PYTHON_RPM_GENERATORS_RPMNAME='python-rpm-generators'
+PYTHON_RPM_GENERATORS_VERSION='12'
+PYTHON_RPM_GENERATORS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --clean'
+PYTHON_RPM_GENERATORS_INSTALL_PACKAGES='python3-rpm-generators*'
+
+PYTHON_PLUGGY_RPMNAME='python-pluggy'
+PYTHON_PLUGGY_VERSION='0.13'
+PYTHON_PLUGGY_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodeps --without docs'
+PYTHON_PLUGGY_INSTALL_PACKAGES='python3-pluggy*'
+
+PYTHON_DISTRO_RPMNAME='python-distro'
+PYTHON_DISTRO_VERSION='1.5.0'
+PYTHON_DISTRO_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without docs'
+PYTHON_DISTRO_INSTALL_PACKAGES='python3-distro*'
+
+PYTHON_MARKUPSAFE_RPMNAME='python-markupsafe'
+PYTHON_MARKUPSAFE_VERSION='1.1.1'
+PYTHON_MARKUPSAFE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without docs'
+PYTHON_MARKUPSAFE_INSTALL_PACKAGES='python3-markupsafe*'
+
+PYTZ_VERSION='2021.1'
+PYTZ_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck --without docs'
+PYTZ_INSTALL_PACKAGES='python3-pytz*'
+
+BABEL_VERSION='2.9.1'
+BABEL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --with bootstrap'
+BABEL_INSTALL_PACKAGES='babel* python3-babel*'
+
+PYTHON_JINJA2_RPMNAME='python-jinja2'
+PYTHON_JINJA2_VERSION='2.11.3'
+PYTHON_JINJA2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_JINJA2_INSTALL_PACKAGES='python3-jinja2*'
+
+PYTHON_PYROUTE2_RPMNAME='python-pyroute2'
+PYTHON_PYROUTE2_VERSION='0.5.14'
+PYTHON_PYROUTE2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_PYROUTE2_INSTALL_PACKAGES='python3-pyroute2*'
+
+PYTHON_REQUESTS_RPMNAME='python-requests'
+PYTHON_REQUESTS_VERSION='2.25.1'
+PYTHON_REQUESTS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_REQUESTS_INSTALL_PACKAGES='python3-requests*'
+
+PYPARSING_VERSION='2.4.7'
+PYPARSING_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --without doc'
+PYPARSING_INSTALL_PACKAGES='python3-pyparsing*'
+
+PYTHON_TEMPLATED_DICTIONARY_RPMNAME='python-templated-dictionary'
+PYTHON_TEMPLATED_DICTIONARY_VERSION='1.1'
+PYTHON_TEMPLATED_DICTIONARY_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_TEMPLATED_DICTIONARY_INSTALL_PACKAGES='python3-templated-dictionary*'
+
+BASH_COMPLETION_RPMNAME='bash-completion'
+BASH_COMPLETION_VERSION='2.11'
+BASH_COMPLETION_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+BASH_COMPLETION_INSTALL_PACKAGES='bash-completion*'
+
+LIBGPG_ERROR_RPMNAME='libgpg-error'
+LIBGPG_ERROR_VERSION='1.42'
+LIBGPG_ERROR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBGPG_ERROR_INSTALL_PACKAGES='libgpg-error*'
+
+LIBASSUAN_VERSION='2.5.5'
+LIBASSUAN_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBASSUAN_INSTALL_PACKAGES='libassuan*'
+
+LIBGCRYPT_VERSION='1.10.0'
+LIBGCRYPT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+LIBGCRYPT_INSTALL_PACKAGES='libgcrypt*'
+
+LIBKSBA_VERSION='1.5.1'
+LIBKSBA_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBKSBA_INSTALL_PACKAGES='libksba*'
+
+GNUPG2_VERSION='2.3.3'
+GNUPG2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+GNUPG2_INSTALL_PACKAGES='gnupg2*'
+
+LIBKCAPI_VERSION='1.3.1'
+LIBKCAPI_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --without doc --clean --nodeps --nocheck'
+LIBKCAPI_INSTALL_PACKAGES='libkcapi*'
+
+LIBXCRYPT_VERSION='4.4.18'
+LIBXCRYPT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo'
+LIBXCRYPT_INSTALL_PACKAGES='libxcrypt*'
+
+NETTLE_VERSION='3.8'
+NETTLE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps'
+NETTLE_INSTALL_PACKAGES='nettle*'
+
+MESON_VERSION='0.58.2'
+MESON_RPMBUILD='rpmbuild --undefine %_annotated_build --define "%version_no_tilde ${MESON_VERSION}" -bb --nodebuginfo --nodeps'
+MESON_INSTALL_PACKAGES='meson*'
+
+GLIB2_VERSION='2.68.4'
+GLIB2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps'
+GLIB2_INSTALL_PACKAGES='glib2*'
+
+BABELTRACE_VERSION='1.5.8'
+BABELTRACE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps'
+BABELTRACE_INSTALL_PACKAGES='babeltrace* libbabeltrace* python3-babeltrace*'
+
+GLIB2_VERSION='2.68.4'
+GLIB2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps'
+GLIB2_INSTALL_PACKAGES='glib2*'
+
+GDB_VERSION='10.2'
+GDB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --nocheck'
+GDB_INSTALL_PACKAGES='gdb-*'
+
+VALGRIND_VERSION='3.19.0'
+VALGRIND_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --nocheck'
+VALGRIND_INSTALL_PACKAGES='valgrind-*'
+
+SYSTEMD_VERSION='250'
+SYSTEMD_RPMBUILD='rpmbuild --undefine %_annotated_build --define "%version_no_tilde 250" -bb --nodebuginfo --nodeps --nocheck'
+SYSTEMD_INSTALL_PACKAGES='systemd*'
+
+CMAKE_VERSION='3.20.2'
+CMAKE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean --without emacs --without gui --without X11_test --without test --without sphinx --with bootstrap'
+CMAKE_INSTALL_PACKAGES='cmake*'
+
+GPGME_VERSION='1.15.1'
+GPGME_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean'
+GPGME_INSTALL_PACKAGES='gpgme* python3-gpg*'
+
+ATTR_VERSION='2.5.1'
+ATTR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+ATTR_INSTALL_PACKAGES='libattr* attr-*'
+
+ACL_VERSION='2.3.1'
+ACL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+ACL_INSTALL_PACKAGES='libacl* acl-*'
+
+SHARUTILS_VERSION='4.15.2'
+SHARUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+SHARUTILS_INSTALL_PACKAGES='sharutils-*'
+
+LIBCAP_NG_RPMNAME='libcap-ng'
+LIBCAP_NG_VERSION='0.8.2'
+LIBCAP_NG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBCAP_NG_INSTALL_PACKAGES='libcap-ng*'
+
+BROTLI_VERSION='1.0.9'
+BROTLI_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+BROTLI_INSTALL_PACKAGES='brotli* libbrotli* python3-brotli*'
+
+LIBEVENT_VERSION='2.1.12'
+LIBEVENT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+LIBEVENT_INSTALL_PACKAGES='libevent-devel* libevent*'
+LIBEVENT_EXCLUDE_PACKAGES='libevent-doc*'
+
+LIBFFI_VERSION='3.4.2'
+LIBFFI_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --with bootstrap' 
+LIBFFI_INSTALL_PACKAGES='libffi*'
+
+LIBSEPOL_VERSION='3.4'
+LIBSEPOL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBSEPOL_INSTALL_PACKAGES='libsepol*'
+
+MULTILIB_RPM_CONFIG_RPMNAME='multilib-rpm-config'
+MULTILIB_RPM_CONFIG_VERSION='1'
+MULTILIB_RPM_CONFIG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+MULTILIB_RPM_CONFIG_INSTALL_PACKAGES='multilib-rpm-config*'
+
+LIBYAML_VERSION='0.2.5'
+LIBYAML_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBYAML_INSTALL_PACKAGES='libyaml*'
+
+RUBY_VERSION='3.0.4'
+RUBY_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck --without systemtap'
+RUBY_INSTALL_PACKAGES='ruby*'
+
+POPT_VERSION='1.18'
+POPT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+POPT_INSTALL_PACKAGES='popt*'
+
+PCRE_VERSION='8.44'
+PCRE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean' 
+PCRE_INSTALL_PACKAGES='pcre-*'
+
+PCRE2_VERSION='10.40'
+PCRE2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean' 
+PCRE2_INSTALL_PACKAGES='pcre2*'
+
+GPM_VERSION='1.20.7'
+GPM_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean' 
+GPM_INSTALL_PACKAGES='gpm*'
+
+NCURSES_VERSION='6.2'
+NCURSES_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean' 
+NCURSES_INSTALL_PACKAGES='ncurses*'
+
+READLINE_VERSION='8.1'
+READLINE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps --clean' 
+READLINE_INSTALL_PACKAGES='readline*'
+
+NPTH_VERSION='1.6'
+NPTH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+NPTH_INSTALL_PACKAGES='npth*'
+
+LZ4_VERSION='1.9.3'
+LZ4_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LZ4_INSTALL_PACKAGES='lz4*'
+
+XZ_VERSION='5.2.5'
+XZ_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+XZ_INSTALL_PACKAGES='xz*'
+
+ZLIB_VERSION='1.2.11'
+ZLIB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+ZLIB_INSTALL_PACKAGES='zlib* minizip*'
+
+UNZIP_VERSION='6.0'
+UNZIP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+UNZIP_INSTALL_PACKAGES='unzip*'
+
+SQLITE_VERSION='3.34'
+SQLITE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nocheck' 
+SQLITE_INSTALL_PACKAGES='sqlite*'
+
+LIBSELINUX_VERSION='3.4'
+LIBSELINUX_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LIBSELINUX_INSTALL_PACKAGES='libselinux* python3-libselinux*'
+
+SED_VERSION='4.8'
+SED_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nocheck'
+SED_INSTALL_PACKAGES='sed*'
+
+EXECSTACK_VERSION='0.5.0'
+EXECSTACK_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+EXECSTACK_INSTALL_PACKAGES='execstack*'
+
+ZSTD_VERSION='1.5.1'
+ZSTD_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+ZSTD_INSTALL_PACKAGES='zstd* libzstd*'
+
+CCACHE_VERSION='4.5.1'
+CCACHE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+CCACHE_INSTALL_PACKAGES='ccache*'
+
+LUA_VERSION='5.4.2'
+LUA_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LUA_INSTALL_PACKAGES='lua*'
+
+LIBUNISTRING_VERSION='0.9.10'
+LIBUNISTRING_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LIBUNISTRING_INSTALL_PACKAGES='libunistring*'
+
+LIBSIGSEGV_VERSION='2.13'
+LIBSIGSEGV_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LIBSIGSEGV_INSTALL_PACKAGES='libsigsegv*'
+
+LIBSEMANAGE_VERSION='3.4'
+LIBSEMANAGE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LIBSEMANAGE_INSTALL_PACKAGES='libsemanage* python3-libsemanage*'
+
+GREP_VERSION='3.6'
+GREP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+GREP_INSTALL_PACKAGES='grep*'
+
+WORDS_VERSION='3.0'
+WORDS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+WORDS_INSTALL_PACKAGES='words*'
+
+CRACKLIB_VERSION='2.9.6'
+CRACKLIB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+CRACKLIB_INSTALL_PACKAGES='cracklib*'
+
+PKGCONF_VERSION='1.7.3'
+PKGCONF_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+PKGCONF_INSTALL_PACKAGES='pkgconf* libpkgconf*'
+
+UNIXODBC_RPMNAME='unixODBC'
+UNIXODBC_VERSION='2.3.9'
+UNIXODBC_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+UNIXODBC_INSTALL_PACKAGES='unixODBC*'
+
+M4_VERSION='1.4.19'
+M4_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+M4_INSTALL_PACKAGES='m4*'
+
+BISON_VERSION='3.7.4'
+BISON_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+BISON_INSTALL_PACKAGES='bison*'
+
+HELP2MAN_VERSION='1.48'
+HELP2MAN_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+HELP2MAN_INSTALL_PACKAGES='help2man*'
+
+FLEX_VERSION='2.6.4'
+FLEX_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+FLEX_INSTALL_PACKAGES='flex* libfl2* libfl-*'
+
+JSON_C_RPMNAME='json-c'
+JSON_C_VERSION='0.14'
+JSON_C_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+JSON_C_INSTALL_PACKAGES='json-c*'
+
+KEYUTILS_VERSION='1.6.1'
+KEYUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps' 
+KEYUTILS_INSTALL_PACKAGES='keyutils*'
+
+LIBTASN1_VERSION='4.16'
+LIBTASN1_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+LIBTASN1_INSTALL_PACKAGES='libtasn1*'
+
+P11_KIT_RPMNAME='p11-kit'
+P11_KIT_VERSION='0.24.1'
+P11_KIT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+P11_KIT_INSTALL_PACKAGES='p11-kit*'
+
+SLANG_VERSION='2.3.2'
+SLANG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nocheck' 
+SLANG_INSTALL_PACKAGES='slang*'
+
+NEWT_VERSION='0.52.21'
+NEWT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean' 
+NEWT_INSTALL_PACKAGES='newt* python3-newt*'
+
+BEAKERLIB_VERSION='1.29.3'
+BEAKERLIB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+BEAKERLIB_INSTALL_PACKAGES='beakerlib*'
+
+ALMALINUX_RELEASE_RPMNAME='almalinux-release'
+ALMALINUX_RELEASE_VERSION='9.1'
+ALMALINUX_RELEASE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+ALMALINUX_RELEASE_INSTALL_PACKAGES='almalinux-gpg-keys* almalinux-sb-certs* almalinux-repos* almalinux-release*'
+
+CHKCONFIG_VERSION='1.20'
+CHKCONFIG_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+CHKCONFIG_INSTALL_PACKAGES='alternatives*'
+
+LIBEV_VERSION='4.33'
+LIBEV_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBEV_INSTALL_PACKAGES='libev-*'
+
+LIBVERTO_VERSION='0.3.2'
+LIBVERTO_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBVERTO_INSTALL_PACKAGES='libverto*'
+
+GZIP_VERSION='1.12'
+GZIP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+GZIP_INSTALL_PACKAGES='gzip*'
+
+DOCBOOK_STYLE_XSL_RPMNAME='docbook-style-xsl'
+DOCBOOK_STYLE_XSL_VERSION='1.79'
+DOCBOOK_STYLE_XSL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+DOCBOOK_STYLE_XSL_INSTALL_PACKAGES='docbook-style-xsl*'
+
+XMLTO_VERSION='0.0.28'
+XMLTO_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+XMLTO_INSTALL_PACKAGES='xmlto*'
+
+EXPAT_VERSION='2.4.9'
+EXPAT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+EXPAT_INSTALL_PACKAGES='expat*'
+
+LIBEDIT_VERSION='3.1'
+LIBEDIT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBEDIT_INSTALL_PACKAGES='libedit*'
+
+LMDB_VERSION='0.9.29'
+LMDB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+LMDB_INSTALL_PACKAGES='lmdb*'
+
+FUSE_VERSION='2.9.9'
+FUSE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+FUSE_INSTALL_PACKAGES='fuse*'
+
+E2FSPROGS_VERSION='1.46.5'
+E2FSPROGS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+E2FSPROGS_INSTALL_PACKAGES='e2fsprogs* libcom_err* libss* e2scrub*'
+
+KRB5_VERSION='1.19.1'
+KRB5_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+KRB5_INSTALL_PACKAGES='krb5* libkadm5*'
+
+NSS_WRAPPER_VERSION='1.1.11'
+NSS_WRAPPER_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+NSS_WRAPPER_INSTALL_PACKAGES='nss_wrapper*'
+
+SOCKET_WRAPPER_VERSION='1.2.5'
+SOCKET_WRAPPER_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+SOCKET_WRAPPER_INSTALL_PACKAGES='socket_wrapper*'
+
+CYRUS_SASL_RPMNAME='cyrus-sasl'
+CYRUS_SASL_VERSION='2.1.27'
+CYRUS_SASL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+CYRUS_SASL_INSTALL_PACKAGES='cyrus-sasl*'
+
+OPENLDAP_VERSION='2.6.2'
+OPENLDAP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+OPENLDAP_INSTALL_PACKAGES='openldap*'
+
+PATCHUTILS_VERSION='0.4.2'
+PATCHUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PATCHUTILS_INSTALL_PACKAGES='patchutils*'
+
+CHECK_VERSION='0.15.2'
+CHECK_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+CHECK_INSTALL_PACKAGES='check*'
+
+LIBCOMPS_VERSION='0.1.18'
+LIBCOMPS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBCOMPS_INSTALL_PACKAGES='libcomps* python3-libcomps*'
+
+RUBYGEM_ASCIIDOCTOR_RPMNAME="rubygem-asciidoctor"
+RUBYGEM_ASCIIDOCTOR_VERSION='2.0.15'
+RUBYGEM_ASCIIDOCTOR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+RUBYGEM_ASCIIDOCTOR_INSTALL_PACKAGES='rubygem-asciidoctor*'
+
+AUDIT_VERSION='3.0.7'
+AUDIT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+AUDIT_INSTALL_PACKAGES='audispd-plugins* audit* python3-audit*'
+
+FILE_VERSION='5.39'
+FILE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+FILE_INSTALL_PACKAGES='file-* python3-file-magic*'
+
+LIBARCHIVE_VERSION='3.5.3'
+LIBARCHIVE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+LIBARCHIVE_INSTALL_PACKAGES='libarchive-* bsdtar* bsdcpio* bsdcat*'
+
+ICU_VERSION='67.1'
+ICU_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+ICU_INSTALL_PACKAGES='icu-* libicu-*'
+
+LIBIDN2_VERSION='2.3.0'
+LIBIDN2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+LIBIDN2_INSTALL_PACKAGES='idn2* libidn2*'
+
+PUBLICSUFFIX_LIST_RPMNAME='publicsuffix-list'
+PUBLICSUFFIX_LIST_VERSION='20210518'
+PUBLICSUFFIX_LIST_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --without dafsa'
+PUBLICSUFFIX_LIST_INSTALL_PACKAGES='publicsuffix-list*'
+
+LIBPSL_VERSION='0.21.1'
+LIBPSL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+LIBPSL_INSTALL_PACKAGES='libpsl* psl-*'
+
+PUBLICSUFFIX_LIST_DAFSA_RPMNAME='publicsuffix-list'
+PUBLICSUFFIX_LIST_DAFSA_VERSION='20210518'
+PUBLICSUFFIX_LIST_DAFSA_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PUBLICSUFFIX_LIST_DAFSA_INSTALL_PACKAGES='publicsuffix-list*'
+
+LIBUSER_VERSION='0.63'
+LIBUSER_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBUSER_INSTALL_PACKAGES='libuser-* python3-libuser*'
+
+LIBUTEMPTER_VERSION='1.2.1'
+LIBUTEMPTER_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+LIBUTEMPTER_INSTALL_PACKAGES='libutempter*'
+
+UTIL_LINUX_RPMNAME='util-linux'
+UTIL_LINUX_VERSION='2.37.4'
+UTIL_LINUX_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+UTIL_LINUX_INSTALL_PACKAGES='libmount* libfdisk* libsmartcols* libblkid* libuuid* uuidd* python3-libmount* util-linux*'
+
+C_ARES_RPMNAME='c-ares'
+C_ARES_VERSION='1.17.1'
+C_ARES_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+C_ARES_INSTALL_PACKAGES='c-ares*'
+
+CUNIT_RPMNAME='CUnit'
+CUNIT_VERSION='2.1.3'
+CUNIT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+CUNIT_INSTALL_PACKAGES='CUnit*'
+
+# TODO: figure out why nghttp2 fails to build unless libevent is rebuilt just beforehand
+NGHTTP2_VERSION='1.43'
+NGHTTP2_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+NGHTTP2_INSTALL_PACKAGES='nghttp2* libnghttp2*'
+
+OPENSSH_VERSION='8.7p1'
+OPENSSH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --define "%skip_gnome_askpass 1"'
+OPENSSH_INSTALL_PACKAGES='openssh* pam_ssh_agent_auth*'
+
+LIBSSH_VERSION='0.9.6'
+LIBSSH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBSSH_INSTALL_PACKAGES='libssh*'
+
+GNUTLS_VERSION='3.7.6'
+GNUTLS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without dane --without tpm2 --without tests'
+GNUTLS_INSTALL_PACKAGES='gnutls*'
+
+CURL_VERSION='7.76.1'
+CURL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+CURL_INSTALL_PACKAGES='curl* libcurl*'
+
+LIBSOLV_VERSION='0.7.22'
+LIBSOLV_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBSOLV_INSTALL_PACKAGES='libsolv* python3-solv* perl-solv* ruby-solv*'
+
+PYXATTR_VERSION='0.7.2'
+PYXATTR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYXATTR_INSTALL_PACKAGES='python3-pyxattr*'
+
+PYTHON_SIX_RPMNAME='python-six'
+PYTHON_SIX_VERSION='1.15.0'
+PYTHON_SIX_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_SIX_INSTALL_PACKAGES='python3-six*'
+
+PYTHON_URLLIB3_RPMNAME='python-urllib3'
+PYTHON_URLLIB3_VERSION='1.26.5'
+PYTHON_URLLIB3_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PYTHON_URLLIB3_INSTALL_PACKAGES='python3-urllib3*'
+
+PYTHON_CHARDET_RPMNAME='python-chardet'
+PYTHON_CHARDET_VERSION='4.0.0'
+PYTHON_CHARDET_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_CHARDET_INSTALL_PACKAGES='python3-chardet*'
+
+PYTHON_IDNA_RPMNAME='python-idna'
+PYTHON_IDNA_VERSION='2.10'
+PYTHON_IDNA_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PYTHON_IDNA_INSTALL_PACKAGES='python3-idna*'
+
+PYTHON_PYGMENTS_RPMNAME='python-pygments'
+PYTHON_PYGMENTS_VERSION='2.7.4'
+PYTHON_PYGMENTS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --without docs --nodeps --nocheck'
+PYTHON_PYGMENTS_INSTALL_PACKAGES='python3-pygments*'
+
+LIBREPO_VERSION='1.14.2'
+LIBREPO_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBREPO_INSTALL_PACKAGES='librepo* python3-librepo*'
+
+ITSTOOL_VERSION='2.0.6'
+ITSTOOL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+ITSTOOL_INSTALL_PACKAGES='itstool*'
+
+SHADOW_UTILS_RPMNAME='shadow-utils'
+SHADOW_UTILS_VERSION='4.9'
+SHADOW_UTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+SHADOW_UTILS_INSTALL_PACKAGES='shadow-utils*'
+
+GTK_DOC_RPMNAME='gtk-doc'
+GTK_DOC_VERSION='1.33.2'
+GTK_DOC_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+GTK_DOC_INSTALL_PACKAGES='gtk-doc*'
+
+PYTHON_MAKO_RPMNAME='python-mako'
+PYTHON_MAKO_VERSION='1.1.4'
+PYTHON_MAKO_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PYTHON_MAKO_INSTALL_PACKAGES='python3-mako*'
+
+CYTHON_RPMNAME='Cython'
+CYTHON_VERSION='0.29.22'
+CYTHON_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+CYTHON_INSTALL_PACKAGES='python3-Cython*'
+
+PYYAML_RPMNAME='PyYAML'
+PYYAML_VERSION='5.4.1'
+PYYAML_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PYYAML_INSTALL_PACKAGES='python3-pyyaml*'
+
+PYTHON_MARKDOWN_RPMNAME='python-markdown'
+PYTHON_MARKDOWN_VERSION='3.3.4'
+PYTHON_MARKDOWN_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PYTHON_MARKDOWN_INSTALL_PACKAGES='python3-markdown*'
+
+MARSHALPARSER_VERSION='0.3.0'
+MARSHALPARSER_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+MARSHALPARSER_INSTALL_PACKAGES='marshalparser*'
+
+GOBJECT_INTROSPECTION_RPMNAME='gobject-introspection'
+GOBJECT_INTROSPECTION_VERSION='1.68.0'
+GOBJECT_INTROSPECTION_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+GOBJECT_INTROSPECTION_INSTALL_PACKAGES='gobject-introspection*'
+
+PYGOBJECT3_VERSION='3.40.1'
+PYGOBJECT3_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYGOBJECT3_INSTALL_PACKAGES='python3-gobject*'
+
+LIBMODULEMD_VERSION='2.13.0'
+LIBMODULEMD_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBMODULEMD_INSTALL_PACKAGES='libmodulemd* python3-libmodulemd*'
+
+CPPUNIT_VERSION='1.15.1'
+CPPUNIT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+CPPUNIT_INSTALL_PACKAGES='cppunit*'
+
+LIBDNF_VERSION='0.67.0'
+LIBDNF_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+LIBDNF_INSTALL_PACKAGES='libdnf* python3-hawkey* python3-libdnf*'
+
+PYTHON_SYSTEMD_RPMNAME='python-systemd'
+PYTHON_SYSTEMD_VERSION='234'
+PYTHON_SYSTEMD_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_SYSTEMD_INSTALL_PACKAGES='python3-systemd*'
+
+DNF_VERSION='4.12'
+DNF_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --nodeps'
+DNF_INSTALL_PACKAGES='dnf* yum* python3-dnf*'
+
+MOCK_VERSION='3.5'
+MOCK_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+MOCK_INSTALL_PACKAGES='mock*'
+
+MOCK_CORE_CONFIGS_RPMNAME='mock-core-configs'
+MOCK_CORE_CONFIGS_VERSION='37.8'
+MOCK_CORE_CONFIGS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+MOCK_CORE_CONFIGS_INSTALL_PACKAGES='mock-core-configs*'
+
+MOCK_CENTOS_SIG_CONFIGS_RPMNAME='mock-centos-sig-configs'
+MOCK_CENTOS_SIG_CONFIGS_VERSION='0.5'
+MOCK_CENTOS_SIG_CONFIGS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+MOCK_CENTOS_SIG_CONFIGS_INSTALL_PACKAGES='mock-centos-sig-configs*'
+
+AUTOCONF_ARCHIVE_RPMNAME='autoconf-archive'
+AUTOCONF_ARCHIVE_VERSION='2019.01.06'
+AUTOCONF_ARCHIVE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+AUTOCONF_ARCHIVE_INSTALL_PACKAGES='autoconf-archive*'
+
+DBUS_VERSION='1.12.20'
+DBUS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without tests'
+DBUS_INSTALL_PACKAGES='dbus*'
+
+DBUS_PYTHON_RPMNAME='dbus-python'
+DBUS_PYTHON_VERSION='1.2.18'
+DBUS_PYTHON_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+DBUS_PYTHON_INSTALL_PACKAGES='python3-dbus* dbus-python-devel*'
+
+AUGEAS_VERSION='1.13.0'
+AUGEAS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+AUGEAS_INSTALL_PACKAGES='augeas*'
+
+GPERF_VERSION='3.1'
+GPERF_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+GPERF_INSTALL_PACKAGES='gperf*'
+
+SATYR_VERSION='0.38'
+SATYR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+SATYR_INSTALL_PACKAGES='satyr* python3-satyr*'
+
+CA_CERTIFICATES_RPMNAME='ca-certificates'
+CA_CERTIFICATES_VERSION='2022.2.54'
+CA_CERTIFICATES_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+CA_CERTIFICATES_INSTALL_PACKAGES='ca-certificates*'
+
+DNF_PLUGINS_CORE_RPMNAME='dnf-plugins-core'
+DNF_PLUGINS_CORE_VERSION='4.1.0'
+DNF_PLUGINS_CORE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+DNF_PLUGINS_CORE_INSTALL_PACKAGES='dnf-plugins-core* yum-utils* python3-dnf-plugin*'
+
+XMLRPC_C_RPMNAME='xmlrpc-c'
+XMLRPC_C_VERSION='1.51'
+XMLRPC_C_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+XMLRPC_C_INSTALL_PACKAGES='xmlrpc-c*'
+
+PERL_CAPTURE_TINY_RPMNAME='perl-Capture-Tiny'
+PERL_CAPTURE_TINY_VERSION='0.48'
+PERL_CAPTURE_TINY_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PERL_CAPTURE_TINY_INSTALL_PACKAGES='perl-Capture-Tiny*'
+
+PERL_DEVEL_CHECKLIB_RPMNAME='perl-Devel-CheckLib'
+PERL_DEVEL_CHECKLIB_VERSION='1.14'
+PERL_DEVEL_CHECKLIB_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PERL_DEVEL_CHECKLIB_INSTALL_PACKAGES='perl-Devel-CheckLib*'
+
+PERL_XML_PARSER_RPMNAME='perl-XML-Parser'
+PERL_XML_PARSER_VERSION='2.46'
+PERL_XML_PARSER_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PERL_XML_PARSER_INSTALL_PACKAGES='perl-XML-Parser*'
+
+INTLTOOL_VERSION='0.51.0'
+INTLTOOL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+INTLTOOL_INSTALL_PACKAGES='intltool*'
+
+LIBREPORT_VERSION='2.15.2'
+LIBREPORT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck --without bugzilla'
+LIBREPORT_INSTALL_PACKAGES='libreport-filesystem*'
+
+GAWK_VERSION='5.1.0'
+GAWK_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+GAWK_INSTALL_PACKAGES='gawk*'
+
+WHICH_VERSION='2.21'
+WHICH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+WHICH_INSTALL_PACKAGES='which*'
+
+PERL_FILE_WHICH_RPMNAME='perl-File-Which'
+PERL_FILE_WHICH_VERSION='1.23'
+PERL_FILE_WHICH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PERL_FILE_WHICH_INSTALL_PACKAGES='perl-File-Which*'
+
+PERL_FILE_PUSHD_RPMNAME='perl-File-pushd'
+PERL_FILE_PUSHD_VERSION='1.016'
+PERL_FILE_PUSHD_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PERL_FILE_PUSHD_INSTALL_PACKAGES='perl-File-pushd*'
+
+TZDATA_VERSION='2022g'
+TZDATA_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+TZDATA_INSTALL_PACKAGES='tzdata*'
+
+CRYPTO_POLICIES_RPMNAME='crypto-policies'
+CRYPTO_POLICIES_VERSION='20220815'
+CRYPTO_POLICIES_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+CRYPTO_POLICIES_INSTALL_PACKAGES='crypto-policies*'
+
+PYTHON_DATEUTIL_RPMNAME='python-dateutil'
+PYTHON_DATEUTIL_VERSION='2.8.1'
+PYTHON_DATEUTIL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PYTHON_DATEUTIL_INSTALL_PACKAGES='python3-dateutil*'
+
+DWZ_VERSION='0.14'
+DWZ_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --nocheck'
+DWZ_INSTALL_PACKAGES='dwz*'
+
+CREATEREPO_C_VERSION='0.17.7'
+CREATEREPO_C_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+CREATEREPO_C_INSTALL_PACKAGES='createrepo_c* python3-createrepo*'
+
+NCOMPRESS_VERSION='5.0'
+NCOMPRESS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+NCOMPRESS_INSTALL_PACKAGES='ncompress*'
+
+PIGZ_VERSION='2.5'
+PIGZ_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PIGZ_INSTALL_PACKAGES='pigz*'
+
+POLICYCOREUTILS_VERSION='3.4'
+POLICYCOREUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+POLICYCOREUTILS_INSTALL_PACKAGES='policycoreutils* python3-policycoreutils*'
+
+TAR_VERSION='1.34'
+TAR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+TAR_INSTALL_PACKAGES='tar*'
+
+USERMODE_VERSION='1.114'
+USERMODE_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps --without gtk'
+USERMODE_INSTALL_PACKAGES='usermode*'
+
+PAM_VERSION='1.5.1'
+PAM_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+PAM_INSTALL_PACKAGES='pam-*'
+
+PASSWD_VERSION='0.80'
+PASSWD_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PASSWD_INSTALL_PACKAGES='passwd*'
+
+DISTRIBUTION_GPG_KEYS_RPMNAME='distribution-gpg-keys'
+DISTRIBUTION_GPG_KEYS_VERSION='1.79'
+DISTRIBUTION_GPG_KEYS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+DISTRIBUTION_GPG_KEYS_INSTALL_PACKAGES='distribution-gpg-keys*'
+
+FINDUTILS_VERSION='4.8'
+FINDUTILS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --nodeps'
+FINDUTILS_INSTALL_PACKAGES='findutils*'
+
+ED_VERSION='1.14.2'
+ED_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+ED_INSTALL_PACKAGES='ed-*'
+
+PATCH_VERSION='2.7.6'
+PATCH_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PATCH_INSTALL_PACKAGES='patch-*'
+
+ZIP_VERSION='3.0'
+ZIP_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+ZIP_INSTALL_PACKAGES='zip-*'
+
+PERL_SRPM_MACROS_RPMNAME='perl-srpm-macros'
+PERL_SRPM_MACROS_VERSION='1'
+PERL_SRPM_MACROS_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+PERL_SRPM_MACROS_INSTALL_PACKAGES='perl-srpm-macros*'
+
+KERNEL_VERSION='5.14'
+KERNEL_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean'
+KERNEL_INSTALL_PACKAGES='kernel-headers*'
+
+ANNOBIN_VERSION='10.73'
+ANNOBIN_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --clean --without clangplugin --without llvmplugin'
+ANNOBIN_INSTALL_PACKAGES='annobin*'
+
+PERL_ERROR_RPMNAME='perl-Error'
+PERL_ERROR_VERSION='0.17029'
+PERL_ERROR_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo'
+PERL_ERROR_INSTALL_PACKAGES='perl-Error*'
+
+PERL_TERMREADKEY_RPMNAME='perl-TermReadKey'
+PERL_TERMREADKEY_VERSION='2.38'
+PERL_TERMREADKEY_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo'
+PERL_TERMREADKEY_INSTALL_PACKAGES='perl-TermReadKey*'
+
+GIT_VERSION='2.31.1'
+GIT_RPMBUILD='rpmbuild --undefine %_annotated_build -bb --nodebuginfo --without emacs --without libsecret --without docs --without tests --without linkcheck --without cvs --without python2 --nodeps'
+GIT_INSTALL_PACKAGES='git-2.31.1* git-core* git-subtree* git-email* perl-Git-2.31.1*'
+
+

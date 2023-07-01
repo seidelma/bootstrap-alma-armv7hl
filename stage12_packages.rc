@@ -1,0 +1,989 @@
+# Packages, in (rough) dependency order
+STAGE1_PACKAGES=("BINUTILS_PHASE1" "GMP" "MPC" "MPFR" "GCC_PHASE1" 
+ "GLIBC" "LIBSTDCXX" "M4" "NCURSES" "BASH" "COREUTILS" "DIFFUTILS" 
+ "FILE" "FINDUTILS"  "GAWK" "GREP" "GZIP" "MAKE" "PATCH" "SED" "TAR"
+ "XZ" "BINUTILS_PHASE2" "GCC_PHASE2")
+
+STAGE2_PACKAGES=("GETTEXT" "BISON" "PERL" "OPENSSL" "UTILLINUX" "ZLIB" 
+ "TEXINFO" "TCL" "BZIP2" "READLINE" "EXPAT" "LIBFFI" "SQLITE"       
+ "PYTHON" "MESON" "NINJA" "NPTH" "POPT" "PKGCONF" "CURL" "PCRE"    
+ "PCRE2" "GIT" "NSS" "RSYNC" "FAKECHROOT" "CRACKLIB"                
+ "ATTR" "ACL" "HELP2MAN" "FLEX" "AUDIT" "LIBSEPOL" "LIBSELINUX"     
+ "LIBSEMANAGE" "GLIB2" "PAM" "SHADOWUTILS" "STRACE" "LUA"           
+ "LIBGPGERROR" "LIBGCRYPT" "REDHAT_RPM_CONFIG" "LIBARCHIVE" "AUTOCONF"
+  "AUTOMAKE" "ZSTD" "ELFUTILS" "GPERF" "LIBCAP" "SYSTEMD" "RPM")
+
+KERNEL_HEADER_VERSION='5.14.0'
+
+BINUTILS_VERSION='2.35.2'
+BINUTILS_SRC_DIR='${SRC_DIR}/binutils-${BINUTILS_VERSION}'
+BINUTILS_PHASE1_CONFIGURE='../configure
+    --prefix=${INSTALL_DIR}/${PHASE1_TOOLS_DIR}
+    --with-sysroot=$INSTALL_DIR
+    --target=$TARGET_TRIPLET
+    --disable-nls
+    --enable-gprofng=no
+    --disable-werror'
+BINUTILS_PHASE1_MAKE='make -j$NPROC && make install'
+BINUTILS_PHASE1_PRE_CONFIG_CMD='mkdir build && pushd build'
+BINUTILS_PHASE1_POST_CONFIG_CMD=''
+BINUTILS_PHASE1_PRE_MAKE_CMD=''
+BINUTILS_PHASE1_POST_MAKE_CMD='popd'
+
+BINUTILS_PHASE2_CONFIGURE='../configure
+    --prefix=/usr
+    --build=$(../config.guess)
+    --host=${TARGET_TRIPLET}
+    --disable-nls
+    --enable-shared
+    --enable-gprofng=no
+    --disable-werror
+    --enable-64-bit-bfd'
+BINUTILS_PHASE2_MAKE='make -j$NPROC && make DESTDIR=${INSTALL_DIR} install'
+BINUTILS_PHASE2_PRE_CONFIG_CMD='sed $'\'6009s/\$add_dir//\'' -i ltmain.sh &&
+    mkdir build && pushd build'
+BINUTILS_PHASE2_POST_CONFIG_CMD=''
+BINUTILS_PHASE2_PRE_MAKE_CMD=''
+BINUTILS_PHASE2_POST_MAKE_CMD='popd &&
+    rm -v ${INSTALL_DIR}/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes}.{a,la}'
+
+GMP_VERSION='6.2.0'
+GMP_SRC_DIR='${SRC_DIR}/gmp-${GMP_VERSION}'
+GMP_CONFIGURE=''
+GMP_MAKE=''
+GMP_PRE_CONFIG_CMD=''
+GMP_POST_CONFIG_CMD=''
+GMP_PRE_MAKE_CMD=''
+GMP_POST_MAKE_CMD=''
+
+MPFR_VERSION='4.1.0'
+MPFR_SRC_DIR='${SRC_DIR}/mpfr-${MPFR_VERSION}'
+MPFR_CONFIGURE=''
+MPFR_MAKE=''
+MPFR_PRE_CONFIG_CMD=''
+MPFR_POST_CONFIG_CMD=''
+MPFR_PRE_MAKE_CMD=''
+MPFR_POST_MAKE_CMD=''
+
+MPC_VERSION='1.2.1'
+MPC_SRC_DIR='${SRC_DIR}/mpc-${MPC_VERSION}'
+MPC_RPMNAME='libmpc'
+MPC_CONFIGURE=''
+MPC_MAKE=''
+MPC_PRE_CONFIG_CMD=''
+MPC_POST_CONFIG_CMD=''
+MPC_PRE_MAKE_CMD=''
+MPC_POST_MAKE_CMD=''
+
+GCC_VERSION='11.3.1'
+GCC_SRC_DIR='$(ls -d ${SRC_DIR}/gcc-${GCC_VERSION}*)' # gcc appends a date to the version, why not
+GCC_PHASE1_CONFIGURE='../configure
+    --target=${TARGET_TRIPLET}
+    --prefix=${INSTALL_DIR}/${PHASE1_TOOLS_DIR}
+    --with-glibc-version=${GLIBC_VERSION}
+    --with-sysroot=${INSTALL_DIR}
+    --with-gcc-major-version-only
+    --with-newlib
+    --with-float=hard
+    --with-fpu=neon
+    --without-headers
+    --disable-nls
+    --disable-shared
+    --disable-multilib
+    --disable-decimal-float
+    --disable-threads
+    --disable-libatomic
+    --disable-libgomp
+    --disable-libquadmath
+    --disable-libssp
+    --disable-libvtv
+    --disable-libstdcxx
+    --enable-languages=c,c++'
+GCC_PHASE1_MAKE='make -j$NPROC && make install'
+GCC_PHASE1_PRE_CONFIG_CMD='
+    cp -a ${SRC_DIR}/mpc-${MPC_VERSION}/ mpc    &&
+    cp -a ${SRC_DIR}/mpfr-${MPFR_VERSION}/ mpfr &&
+    cp -a ${SRC_DIR}/gmp-${GMP_VERSION}/ gmp    &&
+    mkdir build                                 &&
+    pushd build'
+GCC_PHASE1_POST_CONFIG_CMD=''
+GCC_PHASE1_PRE_MAKE_CMD=''
+GCC_PHASE1_POST_MAKE_CMD='popd &&
+    cat ${build_src_dir}/gcc/limitx.h ${build_src_dir}/gcc/glimits.h ${build_src_dir}/gcc/limity.h > $(dirname $(${TARGET_TRIPLET}-gcc -print-libgcc-file-name))/install-tools/include/limits.h'
+
+GCC_PHASE2_CONFIGURE='../configure
+    --build=$(../config.guess)
+    --host=${TARGET_TRIPLET}
+    --target=${TARGET_TRIPLET}
+    LDFLAGS_FOR_TARGET=-L${PWD}/${TARGET_TRIPLET}/libgcc
+    --prefix=/usr
+    --with-build-sysroot=${INSTALL_DIR}
+    --with-gcc-major-version-only
+    --with-float=hard
+    --with-fpu=neon
+    --enable-initfini-array
+    --disable-nls
+    --disable-multilib
+    --disable-decimal-float
+    --disable-libgomp
+    --disable-libquadmath
+    --disable-libssp
+    --disable-libvtv
+    --enable-languages=c,c++'
+GCC_PHASE2_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+GCC_PHASE2_PRE_CONFIG_CMD='
+    cp -a ${SRC_DIR}/mpc-${MPC_VERSION}/ mpc    &&
+    cp -a ${SRC_DIR}/mpfr-${MPFR_VERSION}/ mpfr &&
+    cp -a ${SRC_DIR}/gmp-${GMP_VERSION}/ gmp    &&
+    mkdir build &&
+    pushd build'
+GCC_PHASE2_POST_CONFIG_CMD=''
+GCC_PHASE2_PRE_MAKE_CMD=''
+GCC_PHASE2_POST_MAKE_CMD='popd &&
+    ln -sv gcc ${INSTALL_DIR}/usr/bin/cc'
+
+LIBSTDCXX_VERSION='11.3.1'
+LIBSTDCXX_SRC_DIR=$GCC_SRC_DIR
+LIBSTDCXX_RPMNAME='gcc'
+LIBSTDCXX_CONFIGURE='../libstdc++-v3/configure
+    --host=$TARGET_TRIPLET
+    --build=$(../config.guess)
+    --prefix=/usr
+    --disable-multilib
+    --disable-nls
+    --disable-libstdcxx-pch
+    --with-gcc-major-version-only
+    --with-gxx-include-dir=/${PHASE1_TOOLS_DIR}/${TARGET_TRIPLET}/include/c++/$(${INSTALL_DIR}/${PHASE1_TOOLS_DIR}/bin/${TARGET_TRIPLET}-gcc -dumpversion)'
+LIBSTDCXX_MAKE='make -j$NPROC && make DESTDIR=${INSTALL_DIR} install'
+LIBSTDCXX_PRE_CONFIG_CMD='rm -rf build && mkdir build && pushd build'
+LIBSTDCXX_POST_CONFIG_CMD=''
+LIBSTDCXX_PRE_MAKE_CMD=''
+LIBSTDCXX_POST_MAKE_CMD='rm -v ${INSTALL_DIR}/usr/lib/lib{stdc++,stdc++fs,supc++}.la'
+
+GLIBC_VERSION='2.34'
+GLIBC_SRC_DIR='${SRC_DIR}/glibc-${GLIBC_VERSION}'
+GLIBC_CONFIGURE='CC="armv7hl-redhat-linux-gnueabi-gcc -march=armv7-a -mtune=generic-armv7-a -mfpu=neon -mfloat-abi=hard" ../configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(../scripts/config.guess)
+    --enable-kernel=3.2
+    --with-headers=${INSTALL_DIR}/usr/include
+    --with-fp'
+GLIBC_MAKE='make -j$NPROC && make DESTDIR=${INSTALL_DIR} install'
+GLIBC_PRE_CONFIG_CMD='echo "rootsbindir=/usr/sbin" > configparms &&
+    mkdir build && pushd build'
+GLIBC_POST_CONFIG_CMD=''
+GLIBC_PRE_MAKE_CMD=''
+GLIBC_POST_MAKE_CMD='popd &&
+${INSTALL_DIR}/${PHASE1_TOOLS_DIR}/libexec/gcc/${TARGET_TRIPLET}/$(${INSTALL_DIR}/${PHASE1_TOOLS_DIR}/bin/${TARGET_TRIPLET}-gcc -dumpversion)/install-tools/mkheaders -v -v'
+
+M4_VERSION='1.4.19'
+M4_SRC_DIR='${SRC_DIR}/m4-${M4_VERSION}'
+M4_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)'
+M4_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+M4_PRE_CONFIG_CMD=''
+M4_POST_CONFIG_CMD=''
+M4_PRE_MAKE_CMD=''
+M4_POST_MAKE_CMD=''
+
+NCURSES_VERSION='6.2'
+NCURSES_SRC_DIR='$(ls -d ${SRC_DIR}/ncurses-${NCURSES_VERSION}*)'
+NCURSES_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(./config.guess)
+    --mandir=/usr/share/man
+    --with-manpage-format=normal
+    --with-shared
+    --without-normal
+    --with-cxx-shared
+    --without-debug
+    --without-ada
+    --disable-stripping
+    --enable-widec'
+NCURSES_MAKE='make -j$NPROC && make DESTDIR=${INSTALL_DIR}
+    TIC_PATH=${build_src_dir}/build_tic/progs/tic install'
+NCURSES_PRE_CONFIG_CMD='
+    sed -i $'\'s/mawk//g\'' configure &&
+    mkdir build_tic                   &&
+    pushd build_tic                   &&
+    ../configure                      &&
+    make -C include                   &&
+    make -C progs tic                 &&
+    popd'
+NCURSES_POST_CONFIG_CMD=''
+NCURSES_PRE_MAKE_CMD=''
+NCURSES_POST_MAKE_CMD='echo "INPUT(-lncursesw)" > ${INSTALL_DIR}/usr/lib/libncurses.so'
+
+BASH_VERSION='5.1'
+BASH_SRC_DIR='${SRC_DIR}/bash-${BASH_VERSION}'
+BASH_CONFIGURE='./configure
+    --prefix=/usr
+    --build=$(support/config.guess)
+    --host=${TARGET_TRIPLET}
+    --without-bash-malloc'
+BASH_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+BASH_PRE_CONFIG_CMD=''
+BASH_POST_CONFIG_CMD=''
+BASH_PRE_MAKE_CMD=''
+BASH_POST_MAKE_CMD='ln -sv bash ${INSTALL_DIR}/bin/sh'
+
+
+COREUTILS_VERSION='8.32'
+COREUTILS_SRC_DIR='${SRC_DIR}/coreutils-${COREUTILS_VERSION}'
+COREUTILS_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)
+    --enable-install-program=hostname
+    --enable-no-install-program=kill,uptime'
+COREUTILS_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+COREUTILS_PRE_CONFIG_CMD=''
+COREUTILS_POST_CONFIG_CMD=''
+COREUTILS_PRE_MAKE_CMD=''
+COREUTILS_POST_MAKE_CMD='mv -v  ${INSTALL_DIR}/usr/bin/chroot ${INSTALL_DIR}/usr/sbin &&
+    mkdir -pv ${INSTALL_DIR}/usr/share/man/man8   &&
+    mv -v ${INSTALL_DIR}/usr/share/man/man1/chroot.1 ${INSTALL_DIR}/usr/share/man/man8/chroot.8 &&
+    sed -i $'\'s/"1"/"8"/\'' ${INSTALL_DIR}/usr/share/man/man8/chroot.8'
+
+DIFFUTILS_VERSION='3.7'
+DIFFUTILS_SRC_DIR='${SRC_DIR}/diffutils-${DIFFUTILS_VERSION}'
+DIFFUTILS_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}'
+DIFFUTILS_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+DIFFUTILS_PRE_CONFIG_CMD='echo "" > man/help2man'
+DIFFUTILS_POST_CONFIG_CMD=''
+DIFFUTILS_PRE_MAKE_CMD=''
+DIFFUTILS_POST_MAKE_CMD=''
+
+FILE_VERSION='5.39'
+FILE_SRC_DIR='${SRC_DIR}/file-${FILE_VERSION}'
+FILE_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(./config.guess)'
+FILE_MAKE='make FILE_COMPILE=$(pwd)/build/src/file && make DESTDIR=${INSTALL_DIR} install'
+FILE_PRE_CONFIG_CMD='mkdir ${build_src_dir}/build &&
+        pushd ${build_src_dir}/build              &&
+        ../configure --disable-bzlib --disable-libseccomp --disable-xzlib --disable-zlib &&
+        make                               &&
+        popd'
+FILE_POST_CONFIG_CMD=''
+FILE_PRE_MAKE_CMD=''
+FILE_POST_MAKE_CMD='rm -v ${INSTALL_DIR}/usr/lib/libmagic.la'
+
+FINDUTILS_VERSION='4.8.0'
+FINDUTILS_SRC_DIR='${SRC_DIR}/findutils-${FINDUTILS_VERSION}'
+FINDUTILS_CONFIGURE='./configure
+    --prefix=/usr
+    --localstatedir=/var/lib/locate
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)'
+FINDUTILS_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+FINDUTILS_PRE_CONFIG_CMD=''
+FINDUTILS_POST_CONFIG_CMD=''
+FINDUTILS_PRE_MAKE_CMD=''
+FINDUTILS_POST_MAKE_CMD=''
+
+GAWK_VERSION='5.1.0'
+GAWK_SRC_DIR='${SRC_DIR}/gawk-${GAWK_VERSION}'
+GAWK_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)'
+GAWK_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+GAWK_PRE_CONFIG_CMD='sed -i $'\'s/extras//\'' Makefile.in'
+GAWK_POST_CONFIG_CMD=''
+GAWK_PRE_MAKE_CMD=''
+GAWK_POST_MAKE_CMD=''
+
+GREP_VERSION='3.6'
+GREP_SRC_DIR='${SRC_DIR}/grep-${GREP_VERSION}'
+GREP_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --without-libsigsegv-prefix'
+GREP_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+GREP_PRE_CONFIG_CMD='popd &&
+    sed -i $'\'/gnulib-c-stack-fix.patch/d\'' ${RPMBUILD_TOPDIR}/SPECS/grep.spec &&
+    rpmbuild -bp ${RPMBUILD_TOPDIR}/SPECS/grep.spec &&
+    pushd $build_src_dir'
+GREP_POST_CONFIG_CMD=''
+GREP_PRE_MAKE_CMD=''
+GREP_POST_MAKE_CMD=''
+
+GZIP_VERSION='1.12'
+GZIP_SRC_DIR='${SRC_DIR}/gzip-${GZIP_VERSION}'
+GZIP_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}'
+GZIP_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+GZIP_PRE_CONFIG_CMD=''
+GZIP_POST_CONFIG_CMD=''
+GZIP_PRE_MAKE_CMD=''
+GZIP_POST_MAKE_CMD=''
+
+MAKE_VERSION='4.3'
+MAKE_SRC_DIR='${SRC_DIR}/make-${MAKE_VERSION}'
+MAKE_CONFIGURE='./configure
+    --prefix=/usr
+    --without-guile
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)'
+MAKE_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+MAKE_PRE_CONFIG_CMD=''
+MAKE_POST_CONFIG_CMD=''
+MAKE_PRE_MAKE_CMD=''
+MAKE_POST_MAKE_CMD=''
+
+PATCH_VERSION='2.7.6'
+PATCH_SRC_DIR='${SRC_DIR}/patch-${PATCH_VERSION}'
+PATCH_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)'
+PATCH_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+PATCH_PRE_CONFIG_CMD='popd &&
+    sed -i $'\'/selinux/d\'' ${RPMBUILD_TOPDIR}/SPECS/patch.spec &&
+    rpmbuild -bp ${RPMBUILD_TOPDIR}/SPECS/patch.spec &&
+    pushd $build_src_dir &&
+    aclocal &&
+    autoconf &&
+    automake'
+PATCH_POST_CONFIG_CMD=''
+PATCH_PRE_MAKE_CMD=''
+PATCH_POST_MAKE_CMD=''
+
+SED_VERSION='4.8'
+SED_SRC_DIR='${SRC_DIR}/sed-${SED_VERSION}'
+SED_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}'
+SED_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+SED_PRE_CONFIG_CMD=''
+SED_POST_CONFIG_CMD=''
+SED_PRE_MAKE_CMD=''
+SED_POST_MAKE_CMD=''
+
+TAR_VERSION='1.34'
+TAR_SRC_DIR='${SRC_DIR}/tar-${TAR_VERSION}'
+TAR_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)'
+TAR_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+TAR_PRE_CONFIG_CMD=''
+TAR_POST_CONFIG_CMD=''
+TAR_PRE_MAKE_CMD=''
+TAR_POST_MAKE_CMD=''
+
+XZ_VERSION='5.2.5'
+XZ_SRC_DIR='${SRC_DIR}/xz-${XZ_VERSION}'
+XZ_CONFIGURE='./configure
+    --prefix=/usr
+    --host=${TARGET_TRIPLET}
+    --build=$(build-aux/config.guess)
+    --disable-static
+    --docdir=/usr/share/doc/xz-${XZ_VERSION}'
+XZ_MAKE='make -j${NPROC} && make DESTDIR=${INSTALL_DIR} install'
+XZ_PRE_CONFIG_CMD=''
+XZ_POST_CONFIG_CMD=''
+XZ_PRE_MAKE_CMD=''
+XZ_POST_MAKE_CMD=''
+
+### Stage2 build commands
+GETTEXT_VERSION='0.21'
+GETTEXT_SRC_DIR='${SRC_DIR}/gettext-${GETTEXT_VERSION}'
+GETTEXT_CONFIGURE='./configure 
+    --prefix=/usr
+    --disable-shared
+    --without-libxml-prefix
+    --disable-java'
+GETTEXT_MAKE='make -j${NPROC}'
+GETTEXT_PRE_CONFIG_CMD=''
+GETTEXT_POST_CONFIG_CMD=''
+GETTEXT_PRE_MAKE_CMD=''
+GETTEXT_POST_MAKE_CMD='cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin'
+GETTEXT_PRE_COPY_CMD='pushd $pkg_src_dir && autoreconf -fiv && popd'
+
+BISON_VERSION='3.7.4'
+BISON_SRC_DIR='${SRC_DIR}/bison-${BISON_VERSION}'
+BISON_CONFIGURE='./configure
+    --prefix=/usr
+    --docdir=/usr/share/doc/bison-${BISON_VERSION}'
+BISON_MAKE='make -j${NPROC} && make install'
+BISON_PRE_CONFIG_CMD=''
+BISON_POST_CONFIG_CMD=''
+BISON_PRE_MAKE_CMD=''
+BISON_POST_MAKE_CMD=''
+
+PERL_VERSION='5.32.1'
+PERL_SRC_DIR='${SRC_DIR}/perl-${PERL_VERSION}'
+PERL_CONFIGURE='sh Configure -des
+    -Dprefix=/usr
+    -Dvendorprefix=/usr
+    -Dprivlib=/usr/lib/perl5/${PERL_VERSION}/core_perl
+    -Darchlib=/usr/lib/perl5/${PERL_VERSION}/core_perl
+    -Dsitelib=/usr/lib/perl5/${PERL_VERSION}/site_perl
+    -Dsitearch=/usr/lib/perl5/${PERL_VERSION}/site_perl
+    -Dvendorlib=/usr/lib/perl5/${PERL_VERSION}/vendor_perl
+    -Dvendorarch=/usr/lib/perl5/${PERL_VERSION}/vendor_perl'
+PERL_MAKE='make -j${NPROC} && make install'
+PERL_PRE_CONFIG_CMD=''
+PERL_POST_CONFIG_CMD=''
+PERL_PRE_MAKE_CMD=''
+PERL_POST_MAKE_CMD=''
+PERL_PRE_RPMBUILD_CMD='sed -i $'\'4430,4440s/^/#/\'' ${RPMBUILD_TOPDIR}/SPECS/perl.spec &&
+    sed -i $'\'s/%patch10/#%patch10/\'' ${RPMBUILD_TOPDIR}/SPECS/perl.spec'
+
+OPENSSL_VERSION='3.0.1'
+OPENSSL_SRC_DIR='${SRC_DIR}/openssl-${OPENSSL_VERSION}'
+OPENSSL_CONFIGURE='./Configure --prefix=/usr --openssldir=/etc/pki/tls
+        enable-camellia enable-seed enable-rfc3779
+        enable-cms enable-md2 enable-rc5 enable-ktls enable-fips
+        no-mdc2 no-ec2m no-sm2 no-sm4 enable-buildtest-c++
+        shared -DDEVRANDOM=\"\\\"/dev/urandom\\\"\"
+        -DREDHAT_FIPS_VERSION=\"\\\"BOOTSTRAP-DUMMY\\\"\"'
+OPENSSL_MAKE='make -j${NPROC} && make install'
+OPENSSL_PRE_CONFIG_CMD=''
+OPENSSL_POST_CONFIG_CMD=''
+OPENSSL_PRE_MAKE_CMD=''
+OPENSSL_POST_MAKE_CMD=''
+
+ZLIB_VERSION='1.2.11'
+ZLIB_SRC_DIR='${SRC_DIR}/zlib-${ZLIB_VERSION}'
+ZLIB_CONFIGURE='./configure --prefix=/usr'
+ZLIB_MAKE='make -j${NPROC} && make install'
+ZLIB_PRE_CONFIG_CMD=''
+ZLIB_POST_CONFIG_CMD=''
+ZLIB_PRE_MAKE_CMD=''
+ZLIB_POST_MAKE_CMD=''
+
+EXPAT_VERSION='2.4.9'
+EXPAT_SRC_DIR='${SRC_DIR}/libexpat-R_2_4_9'
+EXPAT_CONFIGURE='./configure --prefix=/usr --disable-static'
+EXPAT_MAKE='make -j${NPROC} && make install'
+EXPAT_PRE_CONFIG_CMD='pushd expat'
+EXPAT_POST_CONFIG_CMD=''
+EXPAT_PRE_MAKE_CMD=''
+EXPAT_POST_MAKE_CMD='popd'
+
+TCL_VERSION='8.6.10'
+TCL_SRC_DIR='${SRC_DIR}/tcl${TCL_VERSION}'       # Note the lack of - in the version string
+TCL_CONFIGURE='./configure --prefix=/usr'
+TCL_MAKE='make -j${NPROC} && make install'
+TCL_PRE_CONFIG_CMD='pushd unix'
+TCL_POST_CONFIG_CMD=''
+TCL_PRE_MAKE_CMD=''
+TCL_POST_MAKE_CMD='popd &&
+    ln -sf /usr/bin/tclsh8.6 /usr/bin/tclsh'
+
+SQLITE_VERSION='3.34.1'
+SQLITE_SRC_DIR='$(ls -d ${SRC_DIR}/sqlite-src*)' # sqlite version = major * 10^6 + minor * 10^5 + patch * 10^2
+SQLITE_CONFIGURE='./configure --prefix=/usr --disable-static --enable-all'
+SQLITE_MAKE='make -j${NPROC} && make install'
+SQLITE_PRE_CONFIG_CMD=''
+SQLITE_POST_CONFIG_CMD=''
+SQLITE_PRE_MAKE_CMD=''
+SQLITE_POST_MAKE_CMD=''
+
+LIBFFI_VERSION='3.4.2'
+LIBFFI_SRC_DIR='${SRC_DIR}/libffi-${LIBFFI_VERSION}'
+LIBFFI_CONFIGURE='./configure --prefix=/usr --disable-static --disable-exec-static-tramp'
+LIBFFI_MAKE='make -j${NPROC} && make install'
+LIBFFI_PRE_CONFIG_CMD=''
+LIBFFI_POST_CONFIG_CMD=''
+LIBFFI_PRE_MAKE_CMD=''
+LIBFFI_POST_MAKE_CMD=''
+
+PYTHON_RPMNAME='python3.9'
+PYTHON_VERSION='3.9.14'
+PYTHON_SRC_DIR='${SRC_DIR}/Python-${PYTHON_VERSION}'
+PYTHON_CONFIGURE='./configure --prefix=/usr
+    --enable-shared
+    --with-system-expat
+    --without-ensurepip
+    --enable-optimizations'
+PYTHON_MAKE='make -j${NPROC} && make install'
+PYTHON_PRE_CONFIG_CMD=''
+PYTHON_POST_CONFIG_CMD=''
+PYTHON_PRE_MAKE_CMD=''
+PYTHON_POST_MAKE_CMD='python3.9 /${CHROOT_SRC_DIR}/get-pip.py'
+PYTHON_PRE_COPY_CMD='pushd ${pkg_src_dir} && autoconf && autoheader && popd'
+PYTHON_POST_COPY_CMD='[ -f ${INSTALL_DIR}/${CHROOT_SRC_DIR}/get_pip.py ] || curl --output-dir ${INSTALL_DIR}/${CHROOT_SRC_DIR} -o get-pip.py https://bootstrap.pypa.io/get-pip.py' 
+
+TEXINFO_VERSION='6.7'
+TEXINFO_SRC_DIR='${SRC_DIR}/texinfo-${TEXINFO_VERSION}'
+TEXINFO_CONFIGURE='./configure --prefix=/usr'
+TEXINFO_MAKE='make -j${NPROC} HELP2MAN=/usr/bin/true &&
+    make install HELP2MAN=/usr/bin/true'
+TEXINFO_PRE_CONFIG_CMD=''
+TEXINFO_POST_CONFIG_CMD=''
+TEXINFO_PRE_MAKE_CMD=''
+TEXINFO_POST_MAKE_CMD=''
+
+UTILLINUX_RPMNAME='util-linux'
+UTILLINUX_VERSION='2.37.4'
+UTILLINUX_SRC_DIR='${SRC_DIR}/util-linux-${UTILLINUX_VERSION}'
+UTILLINUX_CONFIGURE='./configure ADJTIME_PATH=/var/lib/hwclock/adjtime
+    --prefix=/usr
+    --sysconfdir=/etc
+    --localstatedir=/var
+    --sharedstatedir=/var/lib
+    --libdir=/usr/lib
+    --docdir=/usr/share/doc/util-linux-${UTILLINUX_VERSION}
+    --disable-chfn-chsh
+    --disable-login
+    --disable-nologin
+    --disable-su
+    --disable-setpriv
+    --disable-runuser
+    --disable-pylibmount
+    --disable-static
+    --without-python
+    runstatedir=/run'
+UTILLINUX_MAKE='make -j${NPROC} && make install'
+UTILLINUX_PRE_CONFIG_CMD='mkdir -pv /var/lib/hwclock'
+UTILLINUX_POST_CONFIG_CMD=''
+UTILLINUX_PRE_MAKE_CMD=''
+UTILLINUX_POST_MAKE_CMD=''
+UTILLINUX_PRE_COPY_CMD='pushd $pkg_src_dir && autoreconf -fiv && popd'
+
+NPTH_VERSION='1.6'
+NPTH_SRC_DIR='${SRC_DIR}/npth-${NPTH_VERSION}'
+NPTH_CONFIGURE='./configure --prefix=/usr --disable-static'
+NPTH_MAKE='make -j${NPROC} && make install'
+NPTH_PRE_CONFIG_CMD=''
+NPTH_POST_CONFIG_CMD=''
+NPTH_PRE_MAKE_CMD=''
+NPTH_POST_MAKE_CMD=''
+
+POPT_VERSION='1.18'
+POPT_SRC_DIR='${SRC_DIR}/popt-${POPT_VERSION}'
+POPT_CONFIGURE='./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib'
+POPT_MAKE='make -j${NPROC} && make install'
+POPT_PRE_CONFIG_CMD=''
+POPT_POST_CONFIG_CMD=''
+POPT_PRE_MAKE_CMD=''
+POPT_POST_MAKE_CMD=''
+
+PKGCONF_VERSION='1.7.3'
+PKGCONF_SRC_DIR='${SRC_DIR}/pkgconf-${PKGCONF_VERSION}'
+PKGCONF_CONFIGURE='./configure --prefix=/usr --disable-static
+    --with-pkg-config-dir=/usr/lib/pkgconfig:/usr/share/pkgconfig
+    --with-system-libdir=/usr/lib
+    --with-system-includedir=/usr/include'
+PKGCONF_MAKE='make -j${NPROC} && make install'
+PKGCONF_PRE_CONFIG_CMD=''
+PKGCONF_POST_CONFIG_CMD=''
+PKGCONF_PRE_MAKE_CMD=''
+PKGCONF_POST_MAKE_CMD='ln -svf /usr/bin/pkgconf /usr/bin/pkg-config'
+
+MESON_VERSION='0.58.2'
+MESON_SRC_DIR='${SRC_DIR}/meson-${MESON_VERSION}'
+MESON_CONFIGURE=''
+MESON_MAKE='python3 setup.py install --prefix=/usr'
+MESON_PRE_CONFIG_CMD=''
+MESON_POST_CONFIG_CMD=''
+MESON_PRE_MAKE_CMD=''
+MESON_POST_MAKE_CMD=''
+MESON_PRE_RPMBUILD_CMD='sed -i $'\'1i%global\ version_no_tilde\ ${MESON_VERSION}\'' ${RPMBUILD_TOPDIR}/SPECS/meson.spec'
+
+# This mess installs both NSS & NSPR since rpmbuild puts them in the same directory
+NSS_VERSION='3.79'
+NSS_SRC_DIR='${SRC_DIR}/nss-${NSS_VERSION}'
+NSS_CONFIGURE='../nspr/configure --prefix=/usr --with-mozilla --with-pthreads && make && make install'
+NSS_MAKE='make BUILD_OPT=1 NSPR_INCLUDE_DIR=/usr/include/nspr USE_SYSTEM_ZLIB=1 ZLIB_LIBS=-lz NSS_USE_SYSTEM_SQLITE=1 NSS_ENABLE_WERROR=0'
+NSS_PRE_CONFIG_CMD='sed -ri $'\'/^RELEASE/s/^/#/\'' nspr/pr/src/misc/Makefile.in &&
+    sed -i $'\'s#\$\(LIBRARY\)##\''   nspr/config/rules.mk &&
+    mkdir -p nspr-build && pushd nspr-build'
+NSS_POST_CONFIG_CMD='popd'
+NSS_PRE_MAKE_CMD='pushd nss'
+NSS_POST_MAKE_CMD='popd && pushd dist &&
+    install -v -m755 Linux*/lib/*.so /usr/lib              &&
+    install -v -m644 Linux*/lib/{*.chk,libcrmf.a} /usr/lib &&
+    install -v -m755 -d /usr/include/nss                   &&
+    cp -v -RL {public,private}/nss/* /usr/include/nss      &&
+    chmod -v 644 /usr/include/nss/*                        &&
+    install -v -m755 Linux*/bin/{certutil,pk12util} /usr/bin'
+
+CURL_VERSION='7.76.1'
+CURL_SRC_DIR='${SRC_DIR}/curl-${CURL_VERSION}'
+CURL_CONFIGURE='./configure --prefix=/usr --disable-static --with-ssl'
+CURL_MAKE='make -j${NPROC} && make install'
+CURL_PRE_CONFIG_CMD=''
+CURL_POST_CONFIG_CMD=''
+CURL_PRE_MAKE_CMD=''
+CURL_POST_MAKE_CMD=''
+
+GIT_VERSION='2.31.1'
+GIT_SRC_DIR='${SRC_DIR}/git-${GIT_VERSION}'
+GIT_CONFIGURE='./configure --prefix=/usr'
+GIT_MAKE='make -j${NPROC} && make install'
+GIT_PRE_CONFIG_CMD=''
+GIT_POST_CONFIG_CMD=''
+GIT_PRE_MAKE_CMD=''
+GIT_POST_MAKE_CMD=''
+GIT_PRE_COPY_CMD='pushd $pkg_src_dir     &&
+    sed -i $'\'/CFLAGS/d\'' config.mak  &&
+    sed -i $'\'/LDFLAGS/d\'' config.mak &&
+    autoreconf -fiv &&
+    popd'
+
+NINJA_RPMNAME='ninja-build'
+NINJA_VERSION='1.10.2'
+NINJA_SRC_DIR='${SRC_DIR}/ninja-${NINJA_VERSION}'
+NINJA_CONFIGURE=''
+NINJA_MAKE='python3 configure.py --bootstrap --verbose'
+NINJA_PRE_CONFIG_CMD=''
+NINJA_POST_CONFIG_CMD=''
+NINJA_PRE_MAKE_CMD=''
+NINJA_POST_MAKE_CMD='cp ninja /usr/bin'
+
+GLIB2_VERSION='2.68.4'
+GLIB2_SRC_DIR='${SRC_DIR}/glib-${GLIB2_VERSION}'
+GLIB2_CONFIGURE='meson setup bootstrap-alma-arm32-builddir &&
+    meson configure --prefix=/usr bootstrap-alma-arm32-builddir'
+GLIB2_MAKE='meson compile -j${NPROC} && meson install '
+GLIB2_PRE_CONFIG_CMD=''
+GLIB2_POST_CONFIG_CMD=''
+GLIB2_PRE_MAKE_CMD='pushd bootstrap-alma-arm32-builddir'
+GLIB2_POST_MAKE_CMD='popd'
+
+ELFUTILS_VERSION='0.187'
+ELFUTILS_SRC_DIR='${SRC_DIR}/elfutils-${ELFUTILS_VERSION}'
+ELFUTILS_CONFIGURE='./configure 
+    --build=armv7hl-redhat-linux-gnueabi
+    --host=armv7hl-redhat-linux-gnueabi
+    --program-prefix=eu-
+    --disable-dependency-tracking
+    --prefix=/usr
+    --exec-prefix=/usr
+    --bindir=/usr/bin
+    --sbindir=/usr/sbin
+    --sysconfdir=/etc
+    --datadir=/usr/share
+    --includedir=/usr/include
+    --libdir=/usr/lib
+    --libexecdir=/usr/libexec
+    --localstatedir=/var
+    --sharedstatedir=/var/lib
+    --mandir=/usr/share/man
+    --infodir=/usr/share/info
+    --disable-debuginfod
+    --disable-textrelcheck'
+ELFUTILS_MAKE='make -j${NPROC} && make install'
+ELFUTILS_PRE_CONFIG_CMD=''
+ELFUTILS_POST_CONFIG_CMD=''
+ELFUTILS_PRE_MAKE_CMD=''
+ELFUTILS_POST_MAKE_CMD=''
+
+RSYNC_VERSION='3.2.3'
+RSYNC_SRC_DIR='${SRC_DIR}/rsync-${RSYNC_VERSION}'
+RSYNC_CONFIGURE='./configure --prefix=/usr --disable-xxhash --disable-zstd --disable-lz4'
+RSYNC_MAKE='make -j${NPROC} && make install'
+RSYNC_PRE_CONFIG_CMD=''
+RSYNC_POST_CONFIG_CMD=''
+RSYNC_PRE_MAKE_CMD=''
+RSYNC_POST_MAKE_CMD=''
+
+FAKECHROOT_VERSION='2.20.1'
+FAKECHROOT_SRC_DIR='${SRC_DIR}/fakechroot-${FAKECHROOT_VERSION}'
+FAKECHROOT_CONFIGURE='./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib'
+FAKECHROOT_MAKE='make && make install'
+FAKECHROOT_PRE_CONFIG_CMD=''
+FAKECHROOT_POST_CONFIG_CMD=''
+FAKECHROOT_PRE_MAKE_CMD=''
+FAKECHROOT_POST_MAKE_CMD=''
+
+TZDATA_VERSION='2022g'
+TZDATA_SRC_DIR='${SRC_DIR}/tzdata-${TZDATA_VERSION}'
+TZDATA_CONFIGURE=''
+TZDATA_MAKE='make TOPDIR=/ install'
+TZDATA_PRE_CONFIG_CMD=''
+TZDATA_POST_CONFIG_CMD=''
+TZDATA_PRE_MAKE_CMD=''
+TZDATA_POST_MAKE_CMD=''
+
+CRACKLIB_VERSION='2.9.6'
+CRACKLIB_SRC_DIR='${SRC_DIR}/cracklib-${CRACKLIB_VERSION}'
+CRACKLIB_CONFIGURE='./configure --prefix=/usr'
+CRACKLIB_MAKE='make -j${NPROC} && make install'
+CRACKLIB_PRE_CONFIG_CMD=''
+CRACKLIB_POST_CONFIG_CMD=''
+CRACKLIB_PRE_MAKE_CMD=''
+CRACKLIB_POST_MAKE_CMD=''
+CRACKLIB_PRE_COPY_CMD='pushd $pkg_src_dir && autoreconf -fiv && popd'
+
+ATTR_VERSION='2.5.1'
+ATTR_SRC_DIR='${SRC_DIR}/attr-${ATTR_VERSION}'
+ATTR_CONFIGURE='./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib'
+ATTR_MAKE='make -j${NPROC} && make install'
+ATTR_PRE_CONFIG_CMD=''
+ATTR_POST_CONFIG_CMD=''
+ATTR_PRE_MAKE_CMD=''
+ATTR_POST_MAKE_CMD=''
+
+ACL_VERSION='2.3.1'
+ACL_SRC_DIR='${SRC_DIR}/acl-${ACL_VERSION}'
+ACL_CONFIGURE='./configure --prefix=/usr'
+ACL_MAKE='make -j${NPROC} && make install'
+ACL_PRE_CONFIG_CMD=''
+ACL_POST_CONFIG_CMD=''
+ACL_PRE_MAKE_CMD=''
+ACL_POST_MAKE_CMD=''
+
+LIBSELINUX_VERSION='3.4'
+LIBSELINUX_SRC_DIR='${SRC_DIR}/libselinux-${LIBSEMANAGE_VERSION}'
+LIBSELINUX_CONFIGURE=''
+LIBSELINUX_MAKE='make -j${NPROC} && make install'
+LIBSELINUX_PRE_CONFIG_CMD=''
+LIBSELINUX_POST_CONFIG_CMD=''
+LIBSELINUX_PRE_MAKE_CMD=''
+LIBSELINUX_POST_MAKE_CMD=''
+
+LIBSEPOL_VERSION='3.4'
+LIBSEPOL_SRC_DIR='${SRC_DIR}/libsepol-${LIBSEPOL_VERSION}'
+LIBSEPOL_CONFIGURE=''
+LIBSEPOL_MAKE='make -j${NPROC} && make install'
+LIBSEPOL_PRE_CONFIG_CMD=''
+LIBSEPOL_POST_CONFIG_CMD=''
+LIBSEPOL_PRE_MAKE_CMD=''
+LIBSEPOL_POST_MAKE_CMD=''
+
+LIBSEMANAGE_VERSION='3.4'
+LIBSEMANAGE_SRC_DIR='${SRC_DIR}/libsemanage-${LIBSEMANAGE_VERSION}'
+LIBSEMANAGE_CONFIGURE=''
+LIBSEMANAGE_MAKE='make -j${NPROC} && make install'
+LIBSEMANAGE_PRE_CONFIG_CMD=''
+LIBSEMANAGE_POST_CONFIG_CMD=''
+LIBSEMANAGE_PRE_MAKE_CMD=''
+LIBSEMANAGE_POST_MAKE_CMD=''
+
+PAM_VERSION='1.5.1'
+PAM_SRC_DIR='${SRC_DIR}/Linux-PAM-${PAM_VERSION}'
+PAM_CONFIGURE='./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib'
+PAM_MAKE='make -j${NPROC} && make install'
+PAM_PRE_CONFIG_CMD=''
+PAM_POST_CONFIG_CMD=''
+PAM_PRE_MAKE_CMD=''
+PAM_POST_MAKE_CMD=''
+
+SHADOWUTILS_RPMNAME='shadow-utils'
+SHADOWUTILS_VERSION='4.9'
+SHADOWUTILS_SRC_DIR='${SRC_DIR}/shadow-${SHADOWUTILS_VERSION}'
+SHADOWUTILS_CONFIGURE='./configure --prefix=/usr LIBS="-lpam -lpam_misc"'
+SHADOWUTILS_MAKE='make -j${NPROC} && make install'
+SHADOWUTILS_PRE_CONFIG_CMD=''
+SHADOWUTILS_POST_CONFIG_CMD=''
+SHADOWUTILS_PRE_MAKE_CMD=''
+SHADOWUTILS_POST_MAKE_CMD=''
+SHADOWUTILS_PRE_COPY_CMD='pushd $pkg_src_dir && autoreconf -fiv && popd'
+
+STRACE_VERSION='5.18'
+STRACE_SRC_DIR='${SRC_DIR}/strace-${STRACE_VERSION}'
+STRACE_CONFIGURE='./configure --prefix=/usr'
+STRACE_MAKE='make -j${NPROC} && make install'
+STRACE_PRE_CONFIG_CMD=''
+STRACE_POST_CONFIG_CMD=''
+STRACE_PRE_MAKE_CMD=''
+STRACE_POST_MAKE_CMD=''
+
+LUA_VERSION='5.4.2'
+LUA_SRC_DIR='${SRC_DIR}/lua-${LUA_VERSION}'
+LUA_CONFIGURE='./configure --prefix=/usr'
+LUA_MAKE='make -j${NPROC} && make install'
+LUA_PRE_CONFIG_CMD=''
+LUA_POST_CONFIG_CMD=''
+LUA_PRE_MAKE_CMD=''
+LUA_POST_MAKE_CMD=''
+
+PCRE_VERSION='8.44'
+PCRE_SRC_DIR='${SRC_DIR}/pcre-${PCRE_VERSION}'
+PCRE_CONFIGURE='./configure --prefix=/usr'
+PCRE_MAKE='make -j${NPROC} && make install'
+PCRE_PRE_CONFIG_CMD=''
+PCRE_POST_CONFIG_CMD=''
+PCRE_PRE_MAKE_CMD=''
+PCRE_POST_MAKE_CMD=''
+
+PCRE2_VERSION='10.40'
+PCRE2_SRC_DIR='${SRC_DIR}/pcre2-${PCRE2_VERSION}'
+PCRE2_CONFIGURE='./configure --prefix=/usr'
+PCRE2_MAKE='make -j${NPROC} && make install'
+PCRE2_PRE_CONFIG_CMD=''
+PCRE2_POST_CONFIG_CMD=''
+PCRE2_PRE_MAKE_CMD=''
+PCRE2_POST_MAKE_CMD=''
+
+LIBGPGERROR_VERSION='1.42'
+LIBGPGERROR_RPMNAME='libgpg-error'
+LIBGPGERROR_SRC_DIR='${SRC_DIR}/libgpg-error-${LIBGPGERROR_VERSION}'
+LIBGPGERROR_CONFIGURE='./configure --prefix=/usr'
+LIBGPGERROR_MAKE='make -j${NPROC} && make install'
+LIBGPGERROR_PRE_CONFIG_CMD=''
+LIBGPGERROR_POST_CONFIG_CMD=''
+LIBGPGERROR_PRE_MAKE_CMD=''
+LIBGPGERROR_POST_MAKE_CMD=''
+
+LIBGCRYPT_VERSION='1.10.0'
+LIBGCRYPT_SRC_DIR='${SRC_DIR}/libgcrypt-${LIBGCRYPT_VERSION}'
+LIBGCRYPT_CONFIGURE='./configure --prefix=/usr'
+LIBGCRYPT_MAKE='make -j${NPROC} && make install'
+LIBGCRYPT_PRE_CONFIG_CMD=''
+LIBGCRYPT_POST_CONFIG_CMD=''
+LIBGCRYPT_PRE_MAKE_CMD=''
+LIBGCRYPT_POST_MAKE_CMD=''
+
+REDHAT_RPM_CONFIG_VERSION='196'
+REDHAT_RPM_CONFIG_RPMNAME='redhat-rpm-config'
+REDHAT_RPM_CONFIG_SRC_DIR='${SRC_DIR}/redhat-rpm-config-${REDHAT_RPM_CONFIG_VERSION}'
+REDHAT_RPM_CONFIG_CONFIGURE=''
+REDHAT_RPM_CONFIG_MAKE=''
+REDHAT_RPM_CONFIG_PRE_CONFIG_CMD=''
+REDHAT_RPM_CONFIG_POST_CONFIG_CMD=''
+REDHAT_RPM_CONFIG_PRE_MAKE_CMD='mkdir -p /usr/lib/rpm/redhat'
+REDHAT_RPM_CONFIG_POST_MAKE_CMD='mkdir -p /usr/lib/rpm/redhat/find-provides.d &&
+mkdir -p /usr/lib/rpm/macros.d                             &&
+mkdir -p /usr/lib/rpm/fileattrs                            &&
+mkdir -p /usr/lib/rpm/lua/fedora/{rpm,srpm}                &&
+install -p -m 644 -t /usr/lib/rpm/redhat macros rpmrc      &&
+install -p -m 444 -t /usr/lib/rpm/redhat redhat-hardened-* &&
+install -p -m 444 -t /usr/lib/rpm/redhat redhat-annobin-*  &&
+install -p -m 755 -t /usr/lib/rpm/redhat config.*          &&
+install -p -m 755 -t /usr/lib/rpm/redhat dist.sh           &&
+install -p -m 755 -t /usr/lib/rpm/redhat gpgverify         &&
+install -p -m 755 -t /usr/lib/rpm/redhat brp-*             &&
+install -p -m 755 -t /usr/lib/rpm/redhat find-*            &&
+install -p -m 755 -t /usr/lib/rpm/redhat find-*            &&
+install -p -m 755 -t /usr/lib/rpm/redhat brp-*             &&
+install -p -m 644 -t /usr/lib/rpm/macros.d macros.*        &&
+install -p -m 644 -t /usr/lib/rpm/fileattrs *.attr         &&
+install -p -m 644 -t /usr/lib/rpm/lua/fedora common.lua    &&
+install -p -m 644 -t /usr/lib/rpm/lua/fedora/srpm forge.lua'
+
+RPM_VERSION='4.16.1.3'
+RPM_SRC_DIR='${SRC_DIR}/rpm-${RPM_VERSION}'
+RPM_CONFIGURE='./configure --build=armv7hl-redhat-linux-gnueabi --target=armv7hl-redhat-linux-gnueabi --host=armv7hl-redhat-linux-gnueabi --prefix=/usr --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib --with-audit --with-lua --with-acl --with-selinux --enable-bdb=no --with-vendor=redhat'
+RPM_MAKE='make -j${NPROC} && make install'
+RPM_PRE_CONFIG_CMD='autoreconf'
+RPM_POST_CONFIG_CMD=''
+RPM_PRE_MAKE_CMD=''
+RPM_POST_MAKE_CMD=''
+RPM_PRE_COPY_CMD=''
+
+BZIP2_VERSION='1.0.8'
+BZIP2_SRC_DIR='${SRC_DIR}/bzip2-${BZIP2_VERSION}'
+BZIP2_CONFIGURE=''
+BZIP2_MAKE='CC="" CFLAGS="" make && make test && make PREFIX=/usr install'
+BZIP2_PRE_CONFIG_CMD=''
+BZIP2_POST_CONFIG_CMD=''
+BZIP2_PRE_MAKE_CMD=''
+BZIP2_POST_MAKE_CMD='make clean && CC="" CFLAGS="" make -f Makefile-libbz2_so && cp libbz2.so* /usr/lib'
+
+READLINE_VERSION='8.1'
+READLINE_SRC_DIR='${SRC_DIR}/readline-${READLINE_VERSION}'
+READLINE_CONFIGURE='./configure --prefix=/usr --with-curses --disable-static'
+READLINE_MAKE='make SHLIB_LIBS="-lncursesw" -j${NPROC} && make SHLIB_LIBS="-lncursesw" install'
+READLINE_PRE_CONFIG_CMD=''
+READLINE_POST_CONFIG_CMD=''
+READLINE_PRE_MAKE_CMD=''
+READLINE_POST_MAKE_CMD=''
+
+FLEX_VERSION='2.6.4'
+FLEX_SRC_DIR='${SRC_DIR}/flex-${FLEX_VERSION}'
+FLEX_CONFIGURE='./configure --prefix=/usr'
+FLEX_MAKE='make -j${NPROC} && make install'
+FLEX_PRE_CONFIG_CMD=''
+FLEX_POST_CONFIG_CMD=''
+FLEX_PRE_MAKE_CMD=''
+FLEX_POST_MAKE_CMD=''
+FLEX_PRE_COPY_CMD='pushd $pkg_src_dir && autoreconf -fiv && popd'
+
+HELP2MAN_VERSION='1.48.2'
+HELP2MAN_SRC_DIR='${SRC_DIR}/help2man-${HELP2MAN_VERSION}'
+HELP2MAN_CONFIGURE='./configure --prefix=/usr'
+HELP2MAN_MAKE='make && make install'
+HELP2MAN_PRE_CONFIG_CMD=''
+HELP2MAN_POST_CONFIG_CMD=''
+HELP2MAN_PRE_MAKE_CMD=''
+HELP2MAN_POST_MAKE_CMD=''
+
+AUDIT_VERSION='3.0.7'
+AUDIT_SRC_DIR='${SRC_DIR}/audit-${AUDIT_VERSION}'
+AUDIT_CONFIGURE='./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib --disable-zos-remote --without-python3 --without-python'
+AUDIT_MAKE='make -j${NPROC} && make install'
+AUDIT_PRE_CONFIG_CMD=''
+AUDIT_POST_CONFIG_CMD=''
+AUDIT_PRE_MAKE_CMD=''
+AUDIT_POST_MAKE_CMD='ln -sf /usr/include/linux/audit.h /usr/include/audit.h'
+
+LIBARCHIVE_VERSION='3.5.3'
+LIBARCHIVE_SRC_DIR='${SRC_DIR}/libarchive-${LIBARCHIVE_VERSION}'
+LIBARCHIVE_CONFIGURE='./configure --prefix=/usr'
+LIBARCHIVE_MAKE='make -j${NPROC} && make install'
+LIBARCHIVE_PRE_CONFIG_CMD=''
+LIBARCHIVE_POST_CONFIG_CMD=''
+LIBARCHIVE_PRE_MAKE_CMD=''
+LIBARCHIVE_POST_MAKE_CMD=''
+LIBARCHIVE_PRE_COPY_CMD='pushd $pkg_src_dir && autoreconf -fiv && popd'
+
+AUTOMAKE_VERSION='1.16.2'
+AUTOMAKE_SRC_DIR='${SRC_DIR}/automake-${AUTOMAKE_VERSION}'
+AUTOMAKE_CONFIGURE='./configure --prefix=/usr'
+AUTOMAKE_MAKE='make && make install'
+AUTOMAKE_PRE_CONFIG_CMD=''
+AUTOMAKE_POST_CONFIG_CMD=''
+AUTOMAKE_PRE_MAKE_CMD=''
+AUTOMAKE_POST_MAKE_CMD=''
+
+AUTOCONF_VERSION='2.69'
+AUTOCONF_SRC_DIR='${SRC_DIR}/autoconf-${AUTOCONF_VERSION}'
+AUTOCONF_CONFIGURE='./configure --prefix=/usr'
+AUTOCONF_MAKE='make && make install'
+AUTOCONF_PRE_CONFIG_CMD=''
+AUTOCONF_POST_CONFIG_CMD=''
+AUTOCONF_PRE_MAKE_CMD=''
+AUTOCONF_POST_MAKE_CMD=''
+AUTOCONF_PRE_RPMBUILD_CMD='sed -i $'\'s/^Patch3/#Patch3/\'' ${RPMBUILD_TOPDIR}/SPECS/autoconf.spec'
+
+ZSTD_VERSION='1.5.1'
+ZSTD_SRC_DIR='${SRC_DIR}/zstd-${ZSTD_VERSION}'
+ZSTD_CONFIGURE=''
+ZSTD_MAKE='make -j${NPROC}&& make PREFIX=/usr install'
+ZSTD_PRE_CONFIG_CMD=''
+ZSTD_POST_CONFIG_CMD=''
+ZSTD_PRE_MAKE_CMD=''
+ZSTD_POST_MAKE_CMD=''
+
+GPERF_VERSION='3.1'
+GPERF_SRC_DIR='${SRC_DIR}/gperf-${GPERF_VERSION}'
+GPERF_CONFIGURE='./configure --prefix=/usr'
+GPERF_MAKE='make -j${NPROC} && make install'
+GPERF_PRE_CONFIG_CMD=''
+GPERF_POST_CONFIG_CMD=''
+GPERF_PRE_MAKE_CMD=''
+GPERF_POST_MAKE_CMD=''
+
+LIBCAP_VERSION='2.48'
+LIBCAP_SRC_DIR='${SRC_DIR}/libcap-${LIBCAP_VERSION}'
+LIBCAP_CONFIGURE=''
+LIBCAP_MAKE='make -j${NPROC} && make PREFIX=/usr install'
+LIBCAP_PRE_CONFIG_CMD=''
+LIBCAP_POST_CONFIG_CMD=''
+LIBCAP_PRE_MAKE_CMD=''
+LIBCAP_POST_MAKE_CMD=''
+
+SYSTEMD_VERSION='250'
+SYSTEMD_SRC_DIR='${SRC_DIR}/systemd-${SYSTEMD_VERSION}'
+SYSTEMD_CONFIGURE='./configure --prefix=/usr'
+SYSTEMD_MAKE='make -j${NPROC}&& make install'
+SYSTEMD_PRE_CONFIG_CMD='/usr/local/bin/pip install jinja2'
+SYSTEMD_POST_CONFIG_CMD=''
+SYSTEMD_PRE_MAKE_CMD=''
+SYSTEMD_POST_MAKE_CMD=''
+SYSTEMD_PRE_RPMBUILD_CMD='sed -i $'\'1i%global\ version_no_tilde\ 250\'' ${RPMBUILD_TOPDIR}/SPECS/systemd.spec'

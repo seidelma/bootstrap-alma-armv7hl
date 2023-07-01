@@ -1,0 +1,30 @@
+%_host_vendor 			redhat
+%_host 				armv7hl-%{_host_vendor}-linux-gnueabi
+%rhel				9
+
+%_sysconfdir		/etc
+%_sysctldir		/usr/lib/sysctl.d
+%_pkgdocdir		%{_docdir}/%{name}
+%_localstatedir 	/var
+%_sharedstatedir	/var/lib
+%_userunitdir		/usr/lib/systemd/user
+
+%_hardened_cflags       -fstack-protector-strong
+%_hardened_ldflags      -Wl,-z,now
+
+%_unitdir		/usr/lib/systemd/system
+
+%__perl 		/usr/bin/perl
+
+%python3_sitearch	/usr/lib/python3.9/site-packages
+%py3_build		\
+CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\
+/usr/bin/python3 setup.py build --executable="/usr/bin/python3 -s"
+
+%py3_install		\
+CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\
+/usr/bin/python3 setup.py install -O1 --skip-build --root %{_topdir}/BUILDROOT/%{NAME}-%{VERSION}-%{RELEASE}.%{_arch} && \
+rm -rfv %{_topdir}/BUILDROOT/%{NAME}-%{VERSION}-%{RELEASE}.%{_target_cpu}%{_bindir}/__pycache__
+
+%vimfiles_root	%{_datadir}/vim/vimfiles
+%_emacs_sitelispdir	%{_datadir}/emacs/site-lisp

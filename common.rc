@@ -1,0 +1,215 @@
+#!/bin/bash
+INSTALL_DIR="/target"
+STAGE12_PACKAGESRCFILE="${SCRIPT_DIR}/stage12_packages.rc"
+STAGE3_PACKAGESRCFILE="${SCRIPT_DIR}/stage3_packages.rc"
+PHASE1_TOOLS_DIR="p1" # Relative to $INSTALL_DIR
+TARGET_TRIPLET="armv7hl-redhat-linux-gnueabi"
+SRPM_REPO_FSLABEL="LABEL=src"
+SRPM_REPO_MPOINT="/mnt/alma/src"
+SRPM_REPO_DIR="${SRPM_REPO_MPOINT}/all"
+
+STAGE3_REPO_FSLABEL="LABEL=stage3"
+STAGE3_REPO_MPOINT="/mnt/alma/stage3"
+STAGE3_REPO_DIR="${STAGE3_REPO_MPOINT}/rpms"
+STAGE3_SPECFILE_DIR="${SCRIPT_DIR}/stage3/SPECS"
+
+STAGE4_REPO_FSLABEL="LABEL=stage4"
+STAGE4_REPO_MPOINT="/mnt/alma/mock-stage4"
+STAGE4_REPO_DIR="${STAGE4_REPO_MPOINT}/rpms"
+
+CHROOT_SRC_DIR="src"
+CHROOT_SCRIPT_DIR="/tmp/bootstrap-alma-arm32"
+RPMBUILD_TOPDIR="$(rpm -E '%{_topdir}' || echo "dummy")"
+
+MOCK_TARGET="almalinux-9-armv7hl"
+MOCK_ROOT_DIR="/var/lib/mock"
+MOCK_RESULT_DIR="${MOCK_ROOT_DIR}/${MOCK_TARGET}/result"
+
+if [ -f /.in_chroot ]; then
+	SRC_DIR=/${CHROOT_SRC_DIR}
+else
+	SRC_DIR=${RPMBUILD_TOPDIR}/BUILD # Where 'rpmbuild -bp' dumps its output
+fi
+
+CONFIG_SITE=${INSTALL_DIR}/usr/share/config.site
+NPROC=$(nproc)
+
+CFLAGS="-O2 -march=armv7-a -mfpu=vfpv3-d16 -mtune=generic-armv7-a+vfpv3-d16 -mabi=aapcs-linux -mfloat-abi=hard"
+CXXFLAGS="-O2 -march=armv7-a -mfpu=vfpv3-d16 -mtune=generic-armv7-a+vfpv3-d16 -mabi=aapcs-linux -mfloat-abi=hard"
+export CFLAGS CXXFLAGS
+
+LC_ALL=POSIX
+export LC_ALL
+
+PATH=/usr/bin
+
+set_package_vars () {
+        vtmp=$(echo \${"${pkgname}_VERSION":-})
+        pkg_version=$(eval "echo $vtmp")
+        stmp=$(echo \${"${pkgname}_SRC_DIR":-})
+        pkg_src_dir=$(eval "echo $stmp")
+        ctmp=$(echo \${"${pkg}_CONFIGURE":-})
+        configure_cmd=$(eval "echo $ctmp")
+        mtmp=$(echo \${"${pkg}_MAKE":-})
+        make_cmd=$(eval "echo $mtmp")
+        pctmp=$(echo \${"${pkg}_PRE_CONFIG_CMD":-})
+        pre_config_cmd=$(eval "echo $pctmp")
+        octmp=$(echo \${"${pkg}_POST_CONFIG_CMD":-})
+        post_config_cmd=$(eval "echo $octmp")
+        pmtmp=$(echo \${"${pkg}_PRE_MAKE_CMD":-})
+        pre_make_cmd=$(eval "echo $pmtmp")
+        omtmp=$(echo \${"${pkg}_POST_MAKE_CMD":-})
+        post_make_cmd=$(eval "echo $omtmp")
+	rbtmp=$(echo \${"${pkg}_RPMBUILD":-})
+	rpmbuild_cmd=$(eval "echo $rbtmp")
+	pr_tmp=$(echo \${"${pkg}_PRE_RPMBUILD_CMD":-})
+	pre_rpmbuild_cmd=$(eval "echo $pr_tmp")
+	bbtmp=$(echo \${"${pkg}_POST_RPMBUILD_CMD":-})
+	post_rpmbuild_cmd=$(eval "echo $bbtmp")
+	iptmp=$(echo \${"${pkg}_INSTALL_PACKAGES":-})
+	install_packages=$(eval "echo $iptmp")
+	xptmp=$(echo \${"${pkg}_EXCLUDE_PACKAGES":-})
+	exclude_packages=$(eval "echo $xptmp")
+
+	unset vtmp stmp ctmp mtmp pctmp octmp pmtmp omtmp rbtmp bbtmp iptmp xptmp
+}
+
+get_package_name () {
+	# Is there a ${pkg}_RPMNAME variable corresponding to this package?
+	pkgname=$(echo "$pkg" | sed 's/_PHASE.//')
+	pkgname_low=$(echo "$pkgname" | tr '[:upper:]' '[:lower:]')
+	pkgname_tmp=$(echo \${"${pkgname}_RPMNAME":-})
+	pkgname_set=$(eval "echo $pkgname_tmp")
+
+	pkgname_lower="${pkgname_set:-$pkgname_low}"
+
+	unset pkgname_var pkgname_low pkgname_tmp pkgname_set
+}
+
+get_srpm_package () {
+	rpmfile=$(eval "echo $1")
+	package=$(ls "${SRPM_REPO_DIR:?}"/"${rpmfile:?}"*.src.rpm)
+}
+
+do_rpm_install () {
+        rpm -ivh --force --nodeps "$1"
+}
+
+do_rpmbuild_bp () {
+        rpmbuild -bp "$1"
+}
+
+do_rpmbuild_bb () {
+	eval "$rpmbuild_cmd $1"
+	if [ "xx$post_rpmbuild_cmd" != "xx" ]; then
+	    eval "$post_rpmbuild_cmd"
+	fi
+	unset rpmbuild_extra_vars
+}
+
+prep_for_rpmbuild () {
+	get_srpm_package "$1"
+	do_rpm_install "$package"
+	if [ -f "${STAGE3_SPECFILE_DIR}/${pkgname_lower}.spec" ]; then
+		cp "${STAGE3_SPECFILE_DIR}/${pkgname_lower}.spec" "${RPMBUILD_TOPDIR}/SPECS"
+	fi
+	if [ "xx${pre_rpmbuild_cmd}" != "xx" ]; then
+		eval "$pre_rpmbuild_cmd"
+	fi
+}
+
+copy_rpms_to_repo () {
+	incs=""
+	i=0
+        for iglob in $install_packages; do
+        	if [ $i -eq 0 ]; then
+			incs="-name $iglob"
+		else
+			incs="-name $iglob -o $incs"
+		fi
+		i=1
+        done
+	excs=""
+	i=0
+        for xglob in $exclude_packages; do
+		if [ $i -eq 0 ]; then
+			excs="-not -name $xglob"	
+		else
+			excs="-not -name $xglob -a $excs"
+		fi
+		i=1
+        done
+	for file in $(find "${RPMBUILD_TOPDIR}/RPMS" -type f $incs $excs); do
+		cp -v "$file" "${STAGE3_REPO_DIR}"
+	done
+}
+
+do_rpmbuild_and_install () {
+	prep_for_rpmbuild "$1"
+	do_rpmbuild_bb "${RPMBUILD_TOPDIR}/SPECS/$2"
+	copy_rpms_to_repo
+	for iglob in $install_packages; do
+		do_rpm_install "${STAGE3_REPO_DIR}/$iglob"
+	done
+	rm -rf $RPMBUILD_TOPDIR/RPMS
+}
+
+do_srpm_prep () {
+	prep_for_rpmbuild "$1"
+	do_rpmbuild_bp "${RPMBUILD_TOPDIR}/SPECS/$2"
+}
+
+do_build () {
+        build_src_dir=$(eval "echo $pkg_src_dir")
+        pushd "$build_src_dir" || exit
+        # If we've defined any commands to run before doing configure,
+        #  run them now.
+        if [ "xx$pre_config_cmd" != "xx" ]; then
+                eval "$pre_config_cmd"
+        fi
+        eval "$configure_cmd"
+        # Same thing, after running configure.
+        if [ "xx$post_config_cmd" != "xx" ]; then
+                eval "$post_config_cmd"
+        fi
+
+        if [ "xx$pre_make_cmd" != "xx" ]; then
+                eval "$pre_make_cmd"
+        fi
+        eval "$make_cmd"
+        if [ "xx$post_make_cmd" != "xx" ]; then
+                eval "$post_make_cmd"
+        fi
+        # Undefine any variables used during this package build
+        # This will intentionally break the script should any of these
+        # remain undefined when the function is called next.
+        unset pkg_src_dir configure_cmd make_cmd pre_config_cmd post_config_cmd pre_make_cmd post_make_cmd
+        popd || exit
+}
+
+copy_source_to_chroot () {
+	# Is there a ${pkg}_PRE_COPY_CMD variable corresponding to this package?
+	name_tmp=$(echo "$pkg" | sed 's/_PHASE.//')
+	pcopy_tmp=$(echo \${"${pkgname}_PRE_COPY_CMD":-})
+	pcopy_cmd=$(eval "echo $pcopy_tmp")
+	ocopy_tmp=$(echo \${"${pkgname}_POST_COPY_CMD":-})
+	ocopy_cmd=$(eval "echo $ocopy_tmp")
+
+	pkg_src_dir=$1
+	dest_dir=$2
+	pkg_basename=$(basename "$pkg_src_dir")
+	if [ -d "${dest_dir}/${pkg_basename}" ]; then
+		rm -rf "${dest_dir:?}/${pkg_basename:?}"
+	fi
+
+	if [ "xx$pcopy_cmd" != "xx" ]; then
+		eval "$pcopy_cmd"
+	fi
+	cp -a "$pkg_src_dir" "$dest_dir"
+
+	if [ "xx$ocopy_cmd" != "xx" ]; then
+		eval "$ocopy_cmd"
+	fi
+	
+	unset name_tmp pcopy_tmp pcopy_cmd ocopy_tmp ocopy_cmd
+}
