@@ -15,7 +15,7 @@ URL:        https://www.gnu.org/software/autoconf/
 
 Patch1:     autoconf-2.69-perl-5.22-autoscan.patch            
 Patch2:     autoconf-2.69-bash-5-LINENO.patch
-Patch3:     autoconf-2.69-backport-runstatedir-option.patch
+#Patch3:     autoconf-2.69-backport-runstatedir-option.patch
 
 BuildArch:  noarch
 

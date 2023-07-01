@@ -13,7 +13,6 @@ Source2:        socket_wrapper.keyring
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gnupg2
-BuildRequires:  libcmocka-devel >= 1.1.0
 
 Recommends:     cmake
 Recommends:     pkgconfig
@@ -37,8 +36,7 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build
-%cmake \
-    -DUNIT_TESTING=ON
+%cmake
 
 %cmake_build
 

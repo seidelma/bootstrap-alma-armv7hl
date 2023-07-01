@@ -175,7 +175,7 @@ libomp-devel to enable -fopenmp.
 %package libs
 Summary: Runtime library for clang
 Requires: %{name}-resource-filesystem%{?_isa} = %{version}
-Requires: gcc-toolset-12-gcc-c++
+Requires: gcc-c++
 Recommends: compiler-rt%{?_isa} = %{version}
 # libomp-devel is required, so clang can find the omp.h header when compiling
 # with -fopenmp.
@@ -321,7 +321,7 @@ sed -i 's/\@FEDORA_LLVM_LIB_SUFFIX\@//g' test/lit.cfg.py
 
 %ifarch s390 s390x %{arm} %ix86 ppc64le
 # Decrease debuginfo verbosity to reduce memory consumption during final library linking
-%global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
+%global optflags %(echo %{optflags} | sed 's/-g //')
 %endif
 
 %set_build_flags
@@ -354,8 +354,6 @@ mv ../clang-%{compat_ver}.src ../clang
 # -DLLVM_ENABLE_NEW_PASS_MANAGER=ON can be removed once this patch is committed:
 # https://reviews.llvm.org/D107628
 %cmake  -G Ninja \
-	-DCMAKE_C_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/gcc \
-	-DCMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/g++ \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -394,9 +392,9 @@ mv ../clang-%{compat_ver}.src ../clang
 	-DENABLE_LINKER_BUILD_ID:BOOL=ON \
 	-DLLVM_ENABLE_EH=ON \
 	-DLLVM_ENABLE_RTTI=ON \
-	-DLLVM_BUILD_DOCS=ON \
+	-DLLVM_BUILD_DOCS=OFF \
 	-DLLVM_ENABLE_NEW_PASS_MANAGER=ON \
-	-DLLVM_ENABLE_SPHINX=ON \
+	-DLLVM_ENABLE_SPHINX=OFF \
 	-DCLANG_LINK_CLANG_DYLIB=ON \
 	%{?abi_revision:-DLLVM_ABI_REVISION=%{abi_revision}} \
 	-DSPHINX_WARNINGS_AS_ERRORS=OFF \
@@ -408,7 +406,7 @@ mv ../clang-%{compat_ver}.src ../clang
 	-DCLANG_DEFAULT_LINKER=lld \
 %endif
 	-DCLANG_DEFAULT_UNWINDLIB=libgcc \
-	-DGCC_INSTALL_PREFIX=/opt/rh/gcc-toolset-12/root/usr
+	-DGCC_INSTALL_PREFIX=/usr
 
 %cmake_build
 
@@ -457,10 +455,10 @@ chmod a+x %{buildroot}%{_datadir}/scan-view/{Reporter.py,startfile.py}
 %multilib_fix_c_header --file %{_includedir}/clang/Config/config.h
 
 # Move emacs integration files to the correct directory
-mkdir -p %{buildroot}%{_emacs_sitestartdir}
-for f in clang-format.el clang-rename.el clang-include-fixer.el; do
-mv %{buildroot}{%{_datadir}/clang,%{_emacs_sitestartdir}}/$f
-done
+#mkdir -p %{buildroot}%{_emacs_sitestartdir}
+#for f in clang-format.el clang-rename.el clang-include-fixer.el; do
+#mv %{buildroot}{%{_datadir}/clang,%{_emacs_sitestartdir}}/$f
+#done
 
 # remove editor integrations (bbedit, sublime, emacs, vim)
 rm -vf %{buildroot}%{_datadir}/clang/clang-format-bbedit.applescript
@@ -475,13 +473,17 @@ rm -Rvf %{buildroot}%{_datadir}/clang/index.js
 rm -vf %{buildroot}%{_datadir}/clang/bash-autocomplete.sh
 
 # Create Manpage symlinks
-ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang++.1.gz
-ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang-%{maj_ver}.1.gz
-ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang++-%{maj_ver}.1.gz
+#ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang++.1.gz
+#ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang-%{maj_ver}.1.gz
+#ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang++-%{maj_ver}.1.gz
 
 # Add clang++-{version} symlink
 ln -s clang++ %{buildroot}%{_bindir}/clang++-%{maj_ver}
 
+# Dunno why these didn't get installed but here we are
+ln -s clang-%{maj_ver} %{buildroot}%{_bindir}/clang++
+ln -s clang-%{maj_ver} %{buildroot}%{_bindir}/clang-cl
+ln -s clang-%{maj_ver} %{buildroot}%{_bindir}/clang-cpp
 
 # Fix permission
 chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
@@ -537,10 +539,10 @@ false
 %{_bindir}/clang++-%{maj_ver}
 %{_bindir}/clang-cl
 %{_bindir}/clang-cpp
-%{_mandir}/man1/clang.1.gz
-%{_mandir}/man1/clang++.1.gz
-%{_mandir}/man1/clang-%{maj_ver}.1.gz
-%{_mandir}/man1/clang++-%{maj_ver}.1.gz
+#%{_mandir}/man1/clang.1.gz
+#%{_mandir}/man1/clang++.1.gz
+#%{_mandir}/man1/clang-%{maj_ver}.1.gz
+#%{_mandir}/man1/clang++-%{maj_ver}.1.gz
 %endif
 
 %files libs
@@ -628,10 +630,10 @@ false
 %{_bindir}/find-all-symbols
 %{_bindir}/modularize
 %{_bindir}/clang-format-diff
-%{_mandir}/man1/diagtool.1.gz
-%{_emacs_sitestartdir}/clang-format.el
-%{_emacs_sitestartdir}/clang-rename.el
-%{_emacs_sitestartdir}/clang-include-fixer.el
+#%{_mandir}/man1/diagtool.1.gz
+%{_datadir}/clang/clang-format.el
+%{_datadir}/clang/clang-rename.el
+%{_datadir}/clang/clang-include-fixer.el
 %{_datadir}/clang/clang-format.py*
 %{_datadir}/clang/clang-format-diff.py*
 %{_datadir}/clang/clang-include-fixer.py*

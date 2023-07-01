@@ -199,10 +199,10 @@ install -p -c -m 0600 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/default/useradd
 
 
 ln -s useradd $RPM_BUILD_ROOT%{_sbindir}/adduser
-ln -s useradd.8 $RPM_BUILD_ROOT%{_mandir}/man8/adduser.8
-for subdir in $RPM_BUILD_ROOT%{_mandir}/{??,??_??,??_??.*}/man* ; do
-        test -d $subdir && test -e $subdir/useradd.8 && echo ".so man8/useradd.8" > $subdir/adduser.8
-done
+#ln -s useradd.8 $RPM_BUILD_ROOT%{_mandir}/man8/adduser.8
+#for subdir in $RPM_BUILD_ROOT%{_mandir}/{??,??_??,??_??.*}/man* ; do
+#        test -d $subdir && test -e $subdir/useradd.8 && echo ".so man8/useradd.8" > $subdir/adduser.8
+#done
 
 # Remove binaries we don't use.
 rm $RPM_BUILD_ROOT%{_bindir}/chfn
@@ -217,42 +217,42 @@ rm $RPM_BUILD_ROOT%{_sysconfdir}/login.access
 rm $RPM_BUILD_ROOT%{_sysconfdir}/limits
 rm $RPM_BUILD_ROOT%{_sbindir}/logoutd
 rm $RPM_BUILD_ROOT%{_sbindir}/nologin
-rm $RPM_BUILD_ROOT%{_mandir}/man1/chfn.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/chfn.*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/chsh.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/chsh.*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/expiry.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/expiry.*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/groups.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/groups.*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/login.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/login.*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/passwd.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/passwd.*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/su.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man1/su.*
-rm $RPM_BUILD_ROOT%{_mandir}/man5/limits.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man5/limits.*
-rm $RPM_BUILD_ROOT%{_mandir}/man5/login.access.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man5/login.access.*
-rm $RPM_BUILD_ROOT%{_mandir}/man5/passwd.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man5/passwd.*
-rm $RPM_BUILD_ROOT%{_mandir}/man5/porttime.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man5/porttime.*
-rm $RPM_BUILD_ROOT%{_mandir}/man5/suauth.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man5/suauth.*
-rm $RPM_BUILD_ROOT%{_mandir}/man8/logoutd.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man8/logoutd.*
-rm $RPM_BUILD_ROOT%{_mandir}/man8/nologin.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man8/nologin.*
-rm $RPM_BUILD_ROOT%{_mandir}/man3/getspnam.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man3/getspnam.*
-rm $RPM_BUILD_ROOT%{_mandir}/man5/faillog.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man5/faillog.*
-rm $RPM_BUILD_ROOT%{_mandir}/man8/faillog.*
-rm $RPM_BUILD_ROOT%{_mandir}/*/man8/faillog.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/chfn.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/chfn.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/chsh.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/chsh.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/expiry.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/expiry.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/groups.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/groups.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/login.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/login.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/passwd.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/passwd.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man1/su.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man1/su.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man5/limits.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man5/limits.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man5/login.access.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man5/login.access.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man5/passwd.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man5/passwd.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man5/porttime.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man5/porttime.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man5/suauth.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man5/suauth.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man8/logoutd.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man8/logoutd.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man8/nologin.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man8/nologin.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man3/getspnam.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man3/getspnam.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man5/faillog.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man5/faillog.*
+#rm $RPM_BUILD_ROOT%{_mandir}/man8/faillog.*
+#rm $RPM_BUILD_ROOT%{_mandir}/*/man8/faillog.*
 
-find $RPM_BUILD_ROOT%{_mandir} -depth -type d -empty -delete
+#find $RPM_BUILD_ROOT%{_mandir} -depth -type d -empty -delete
 %find_lang shadow
 for dir in $(ls -1d $RPM_BUILD_ROOT%{_mandir}/{??,??_??}) ; do
     dir=$(echo $dir | sed -e "s|^$RPM_BUILD_ROOT||")
@@ -293,35 +293,35 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libsubid.la
 %{_sbindir}/newusers
 %{_sbindir}/vipw
 %{_sbindir}/vigr
-%{_mandir}/man1/chage.1*
-%{_mandir}/man1/gpasswd.1*
-%{_mandir}/man1/sg.1*
-%{_mandir}/man1/newgrp.1*
-%{_mandir}/man1/newgidmap.1*
-%{_mandir}/man1/newuidmap.1*
-%{_mandir}/man3/shadow.3*
-%{_mandir}/man5/shadow.5*
-%{_mandir}/man5/login.defs.5*
-%{_mandir}/man5/gshadow.5*
-%{_mandir}/man5/subuid.5*
-%{_mandir}/man5/subgid.5*
-%{_mandir}/man8/adduser.8*
-%{_mandir}/man8/group*.8*
-%{_mandir}/man8/user*.8*
-%{_mandir}/man8/pwck.8*
-%{_mandir}/man8/grpck.8*
-%{_mandir}/man8/chpasswd.8*
-%{_mandir}/man8/chgpasswd.8*
-%{_mandir}/man8/newusers.8*
-%{_mandir}/man8/*conv.8*
-%{_mandir}/man8/lastlog.8*
-%{_mandir}/man8/vipw.8*
-%{_mandir}/man8/vigr.8*
+#%{_mandir}/man1/chage.1*
+#%{_mandir}/man1/gpasswd.1*
+#%{_mandir}/man1/sg.1*
+#%{_mandir}/man1/newgrp.1*
+#%{_mandir}/man1/newgidmap.1*
+#%{_mandir}/man1/newuidmap.1*
+#%{_mandir}/man3/shadow.3*
+#%{_mandir}/man5/shadow.5*
+#%{_mandir}/man5/login.defs.5*
+#%{_mandir}/man5/gshadow.5*
+#%{_mandir}/man5/subuid.5*
+#%{_mandir}/man5/subgid.5*
+#%{_mandir}/man8/adduser.8*
+#%{_mandir}/man8/group*.8*
+#%{_mandir}/man8/user*.8*
+#%{_mandir}/man8/pwck.8*
+#%{_mandir}/man8/grpck.8*
+#%{_mandir}/man8/chpasswd.8*
+#%{_mandir}/man8/chgpasswd.8*
+#%{_mandir}/man8/newusers.8*
+#%{_mandir}/man8/*conv.8*
+#%{_mandir}/man8/lastlog.8*
+#%{_mandir}/man8/vipw.8*
+#%{_mandir}/man8/vigr.8*
 
 %files subid
 %{_libdir}/libsubid.so.*
 %{_bindir}/getsubids
-%{_mandir}/man1/getsubids.1*
+#%{_mandir}/man1/getsubids.1*
 
 %files subid-devel
 %{includesubiddir}/subid.h

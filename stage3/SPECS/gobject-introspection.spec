@@ -66,11 +66,12 @@ Libraries and headers for gobject-introspection
 %autosetup -p1
 
 %build
-%meson -Ddoctool=enabled -Dgtk_doc=true -Dpython=%{__python3}
+%meson -Dcairo=disabled
 %meson_build
 
 %install
 %meson_install
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/gtk-doc/html/gi
 
 %files
 %doc NEWS README.rst

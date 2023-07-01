@@ -93,8 +93,9 @@ test -f uconfig.h.prepend && sed -e '/^#define __UCONFIG_H__/ r uconfig.h.prepen
 sed -i -r 's|(PKGDATA_OPTS = )|\1-v |' data/Makefile
 
 %make_build
+echo "finished make_build"
 %make_build doc
-
+echo "finished make_build on docs"
 
 %install
 rm -rf $RPM_BUILD_ROOT source/__docs
@@ -177,7 +178,7 @@ LD_LIBRARY_PATH=lib:stubdata:tools/ctestfw:$LD_LIBRARY_PATH bin/uconv -l
 %files -n lib%{name}-doc
 %license LICENSE
 %doc readme.html
-%doc source/__docs/%{name}/html/*
+#%doc source/__docs/%{name}/html/*
 
 
 %changelog

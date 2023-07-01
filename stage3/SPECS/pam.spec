@@ -55,7 +55,6 @@ Patch9:  pam-1.5.1-pam-usertype-SYS_UID_MAX.patch
 %endif
 %global _performance_build 1
 
-Requires: libpwquality >= 0.9.9
 BuildRequires: make
 BuildRequires: autoconf >= 2.60
 BuildRequires: automake, libtool
@@ -71,7 +70,6 @@ BuildRequires: libselinux-devel >= 1.33.2
 Requires: libselinux >= 1.33.2
 %endif
 BuildRequires: libeconf-devel >= 0.3.5
-Requires: libeconf >= 0.3.5
 Requires: glibc >= 2.3.90-37
 BuildRequires: libxcrypt-devel >= 4.3.3-2
 BuildRequires: libdb-devel
@@ -375,13 +373,13 @@ done
 %{_libdir}/libpam.so
 %{_libdir}/libpamc.so
 %{_libdir}/libpam_misc.so
-%doc doc/mwg/*.txt doc/mwg/html
-%doc doc/adg/*.txt doc/adg/html
+#%doc doc/mwg/*.txt doc/mwg/html
+#%doc doc/adg/*.txt doc/adg/html
 %doc doc/specs/rfc86.0.txt
 
 %files docs
-%doc doc/txts
-%doc doc/sag/*.txt doc/sag/html
+#%doc doc/txts
+#%doc doc/sag/*.txt doc/sag/html
 
 %changelog
 * Thu Jun 23 2022 Iker Pedrosa <ipedrosa@redhat.com> - 1.5.1-12

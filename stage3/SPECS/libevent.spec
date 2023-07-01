@@ -75,7 +75,7 @@ pathfix.py -i %{__python3} -pn test/check-dumpevents.py \
 ./autogen.sh
 %configure \
 %if ! 0%{?_module_build}
-    --enable-doxygen-doc \
+    --disable-doxygen-doc \
 %endif
     --disable-dependency-tracking --disable-static
 %make_build all
@@ -86,7 +86,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # Maintain the Fedora-specific location of libevent documentation, at
 # least for now
-mv $RPM_BUILD_ROOT/%{_docdir}/%{name} $RPM_BUILD_ROOT/%{develdocdir}
+#mv $RPM_BUILD_ROOT/%{_docdir}/%{name} $RPM_BUILD_ROOT/%{develdocdir}
 
 # Fix multilib install of devel (bug #477685)
 mv $RPM_BUILD_ROOT%{_includedir}/event2/event-config.h \

@@ -257,14 +257,17 @@ sed -e 's/centos/almalinux/g' -i po/*.po
 
 
 %build
+sed -i '/AC_PATH_PROG(\[ASCIIDOC\]/,+7 s/^/#/' configure.ac
+sed -i 's/SUBDIRS = data po src tests doc apidoc/SUBDIRS = data po src tests/' Makefile.am
 ./autogen.sh
 
 %configure \
 %if %{without bugzilla}
         --without-bugzilla \
 %endif
-        --enable-doxygen-docs \
-        --disable-silent-rules
+        --disable-doxygen-docs \
+        --disable-silent-rules \
+        --without-gtk
 
 %make_build
 
@@ -392,16 +395,16 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %license COPYING
 %config(noreplace) %{_sysconfdir}/%{name}/libreport.conf
 %config(noreplace) %{_sysconfdir}/%{name}/report_event.conf
-%config(noreplace) %{_sysconfdir}/%{name}/forbidden_words.conf
-%config(noreplace) %{_sysconfdir}/%{name}/ignored_words.conf
-%config(noreplace) %{_sysconfdir}/%{name}/ignored_elements.conf
+#%config(noreplace) %{_sysconfdir}/%{name}/forbidden_words.conf
+#%config(noreplace) %{_sysconfdir}/%{name}/ignored_words.conf
+#%config(noreplace) %{_sysconfdir}/%{name}/ignored_elements.conf
 %{_datadir}/%{name}/conf.d/libreport.conf
 %{_libdir}/libreport.so.*
-%{_mandir}/man5/libreport.conf.5*
-%{_mandir}/man5/report_event.conf.5*
-%{_mandir}/man5/forbidden_words.conf.5*
-%{_mandir}/man5/ignored_words.conf.5*
-%{_mandir}/man5/ignored_elements.conf.5*
+#%{_mandir}/man5/libreport.conf.5*
+#%{_mandir}/man5/report_event.conf.5*
+#%{_mandir}/man5/forbidden_words.conf.5*
+#%{_mandir}/man5/ignored_words.conf.5*
+#%{_mandir}/man5/ignored_elements.conf.5*
 # filesystem package owns /usr/share/augeas/lenses directory
 %{_datadir}/augeas/lenses/libreport.aug
 
@@ -419,7 +422,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files devel
 # Public api headers:
-%doc apidoc/html/*.{html,png,css,js}
+#%doc apidoc/html/*.{html,png,css,js}
 %{_includedir}/libreport/libreport_types.h
 %{_includedir}/libreport/client.h
 %{_includedir}/libreport/dump_dir.h
@@ -432,9 +435,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_includedir}/libreport/file_obj.h
 %{_includedir}/libreport/config_item_info.h
 %{_includedir}/libreport/workflow.h
-%{_includedir}/libreport/problem_details_widget.h
-%{_includedir}/libreport/problem_details_dialog.h
-%{_includedir}/libreport/problem_utils.h
+#%{_includedir}/libreport/problem_details_widget.h
+#%{_includedir}/libreport/problem_details_dialog.h
+#%{_includedir}/libreport/problem_utils.h
 %{_includedir}/libreport/ureport.h
 %{_includedir}/libreport/reporters.h
 %{_includedir}/libreport/global_configuration.h
@@ -460,43 +463,43 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files cli
 %{_bindir}/report-cli
-%{_mandir}/man1/report-cli.1.gz
+#%{_mandir}/man1/report-cli.1.gz
 
 %files newt
 %{_bindir}/report-newt
-%{_mandir}/man1/report-newt.1.gz
+#%{_mandir}/man1/report-newt.1.gz
 
 %files gtk
-%{_bindir}/report-gtk
-%{_libdir}/libreport-gtk.so.*
-%{_mandir}/man1/report-gtk.1.gz
+#%{_bindir}/report-gtk
+#%{_libdir}/libreport-gtk.so.*
+#%{_mandir}/man1/report-gtk.1.gz
 
 %files gtk-devel
-%{_libdir}/libreport-gtk.so
-%{_includedir}/libreport/internal_libreport_gtk.h
-%{_libdir}/pkgconfig/libreport-gtk.pc
+#%{_libdir}/libreport-gtk.so
+#%{_includedir}/libreport/internal_libreport_gtk.h
+#%{_libdir}/pkgconfig/libreport-gtk.pc
 
 %files plugin-kerneloops
 %{_datadir}/%{name}/events/report_Kerneloops.xml
-%{_mandir}/man*/reporter-kerneloops.*
+#%{_mandir}/man*/reporter-kerneloops.*
 %{_bindir}/reporter-kerneloops
 
 %files plugin-logger
 %config(noreplace) %{_sysconfdir}/libreport/events/report_Logger.conf
-%{_mandir}/man5/report_Logger.conf.5.*
+#%{_mandir}/man5/report_Logger.conf.5.*
 %{_datadir}/%{name}/events/report_Logger.xml
 %{_datadir}/%{name}/workflows/workflow_Logger.xml
 %{_datadir}/%{name}/workflows/workflow_LoggerCCpp.xml
 %config(noreplace) %{_sysconfdir}/libreport/events.d/print_event.conf
 %config(noreplace) %{_sysconfdir}/libreport/workflows.d/report_logger.conf
-%{_mandir}/man5/print_event.conf.5.*
-%{_mandir}/man5/report_logger.conf.5.*
+#%{_mandir}/man5/print_event.conf.5.*
+#%{_mandir}/man5/report_logger.conf.5.*
 %{_bindir}/reporter-print
-%{_mandir}/man*/reporter-print.*
+#%{_mandir}/man*/reporter-print.*
 
 %files plugin-systemd-journal
 %{_bindir}/reporter-systemd-journal
-%{_mandir}/man*/reporter-systemd-journal.*
+#%{_mandir}/man*/reporter-systemd-journal.*
 
 %files plugin-mailx
 %config(noreplace) %{_sysconfdir}/libreport/plugins/mailx.conf
@@ -506,18 +509,18 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/%{name}/workflows/workflow_MailxCCpp.xml
 %config(noreplace) %{_sysconfdir}/libreport/events.d/mailx_event.conf
 %config(noreplace) %{_sysconfdir}/libreport/workflows.d/report_mailx.conf
-%{_mandir}/man5/mailx.conf.5.*
-%{_mandir}/man5/mailx_event.conf.5.*
-%{_mandir}/man5/report_mailx.conf.5.*
-%{_mandir}/man*/reporter-mailx.*
+#%{_mandir}/man5/mailx.conf.5.*
+#%{_mandir}/man5/mailx_event.conf.5.*
+#%{_mandir}/man5/report_mailx.conf.5.*
+#%{_mandir}/man*/reporter-mailx.*
 %{_bindir}/reporter-mailx
 
 %files plugin-ureport
 %config(noreplace) %{_sysconfdir}/libreport/plugins/ureport.conf
 %{_datadir}/%{name}/conf.d/plugins/ureport.conf
 %{_bindir}/reporter-ureport
-%{_mandir}/man1/reporter-ureport.1.gz
-%{_mandir}/man5/ureport.conf.5.gz
+#%{_mandir}/man1/reporter-ureport.1.gz
+#%{_mandir}/man5/ureport.conf.5.gz
 %{_datadir}/%{name}/events/report_uReport.xml
 
 %if %{with bugzilla}
@@ -554,12 +557,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %config(noreplace) %{_sysconfdir}/libreport/plugins/mantisbt_format_analyzer_libreport.conf
 %config(noreplace) %{_sysconfdir}/libreport/plugins/mantisbt_formatdup_analyzer_libreport.conf
 %{_bindir}/reporter-mantisbt
-%{_mandir}/man1/reporter-mantisbt.1.gz
-%{_mandir}/man5/mantisbt.conf.5.*
-%{_mandir}/man5/mantisbt_format.conf.5.*
-%{_mandir}/man5/mantisbt_formatdup.conf.5.*
-%{_mandir}/man5/mantisbt_format_analyzer_libreport.conf.5.*
-%{_mandir}/man5/mantisbt_formatdup_analyzer_libreport.conf.5.*
+#%{_mandir}/man1/reporter-mantisbt.1.gz
+#%{_mandir}/man5/mantisbt.conf.5.*
+#%{_mandir}/man5/mantisbt_format.conf.5.*
+#%{_mandir}/man5/mantisbt_formatdup.conf.5.*
+#%{_mandir}/man5/mantisbt_format_analyzer_libreport.conf.5.*
+#%{_mandir}/man5/mantisbt_formatdup_analyzer_libreport.conf.5.*
 
 %files almalinux
 %{_datadir}/%{name}/workflows/workflow_AlmaLinuxCCpp.xml
@@ -572,17 +575,17 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/%{name}/workflows/workflow_AlmaLinuxJava.xml
 %{_datadir}/%{name}/workflows/workflow_AlmaLinuxJavaScript.xml
 %config(noreplace) %{_sysconfdir}/libreport/workflows.d/report_almalinux.conf
-%{_mandir}/man5/report_almalinux.conf.5.*
+#%{_mandir}/man5/report_almalinux.conf.5.*
 %{_datadir}/%{name}/events/report_AlmaLinuxBugTracker.xml
 %config(noreplace) %{_sysconfdir}/libreport/events/report_AlmaLinuxBugTracker.conf
-%{_mandir}/man5/report_AlmaLinuxBugTracker.conf.5.*
+#%{_mandir}/man5/report_AlmaLinuxBugTracker.conf.5.*
 # report_AlmaLinuxBugTracker events are shipped by libreport package
 %config(noreplace) %{_sysconfdir}/libreport/events.d/almalinux_report_event.conf
-%{_mandir}/man5/almalinux_report_event.conf.5.gz
+#%{_mandir}/man5/almalinux_report_event.conf.5.gz
 
 %files plugin-reportuploader
-%{_mandir}/man*/reporter-upload.*
-%{_mandir}/man5/uploader_event.conf.5.*
+#%{_mandir}/man*/reporter-upload.*
+#%{_mandir}/man5/uploader_event.conf.5.*
 %{_bindir}/reporter-upload
 %{_datadir}/%{name}/events/report_Uploader.xml
 %config(noreplace) %{_sysconfdir}/libreport/events.d/uploader_event.conf
@@ -590,11 +593,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/%{name}/workflows/workflow_UploadCCpp.xml
 %config(noreplace) %{_sysconfdir}/libreport/plugins/upload.conf
 %{_datadir}/%{name}/conf.d/plugins/upload.conf
-%{_mandir}/man5/upload.conf.5.*
+#%{_mandir}/man5/upload.conf.5.*
 %config(noreplace) %{_sysconfdir}/libreport/workflows.d/report_uploader.conf
-%{_mandir}/man5/report_uploader.conf.5.*
+#%{_mandir}/man5/report_uploader.conf.5.*
 %config(noreplace) %{_sysconfdir}/libreport/events/report_Uploader.conf
-%{_mandir}/man5/report_Uploader.conf.5.*
+#%{_mandir}/man5/report_Uploader.conf.5.*
 
 %if %{with bugzilla}
 %files anaconda

@@ -91,14 +91,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description devel
 The glib2-devel package includes the header files for the GLib library.
 
-%package doc
-Summary: A library of handy utility functions
-Requires: %{name} = %{version}-%{release}
-BuildArch: noarch
-
-%description doc
-The glib2-doc package includes documentation for the GLib library.
-
 %package static
 Summary: glib static
 Requires: %{name}-devel = %{version}-%{release}
@@ -122,14 +114,8 @@ the functionality of the installed glib2 package.
 rm glib/pcre/*.[ch]
 
 %meson \
-    -Dman=true \
-    -Ddtrace=true \
-    -Dsystemtap=true \
-    -Dsysprof=enabled \
     -Dglib_debug=disabled \
-    -Dgtk_doc=true \
     -Dinstalled_tests=true \
-    -Dgnutls=true \
     --default-library=both \
     %{nil}
 
@@ -196,12 +182,12 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_bindir}/gsettings
 %{_bindir}/gdbus
 %{_bindir}/gapplication
-%{_mandir}/man1/gio.1*
-%{_mandir}/man1/gio-querymodules.1*
-%{_mandir}/man1/glib-compile-schemas.1*
-%{_mandir}/man1/gsettings.1*
-%{_mandir}/man1/gdbus.1*
-%{_mandir}/man1/gapplication.1*
+#%{_mandir}/man1/gio.1*
+#%{_mandir}/man1/gio-querymodules.1*
+#%{_mandir}/man1/glib-compile-schemas.1*
+#%{_mandir}/man1/gsettings.1*
+#%{_mandir}/man1/gdbus.1*
+#%{_mandir}/man1/gapplication.1*
 
 %files devel
 %{_libdir}/lib*.so
@@ -224,21 +210,18 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_bindir}/gresource
 %{_datadir}/glib-2.0/codegen
 %attr (0755, root, root) %{_bindir}/gtester-report
-%{_mandir}/man1/glib-genmarshal.1*
-%{_mandir}/man1/glib-gettextize.1*
-%{_mandir}/man1/glib-mkenums.1*
-%{_mandir}/man1/gobject-query.1*
-%{_mandir}/man1/gtester-report.1*
-%{_mandir}/man1/gtester.1*
-%{_mandir}/man1/gdbus-codegen.1*
-%{_mandir}/man1/glib-compile-resources.1*
-%{_mandir}/man1/gresource.1*
+#%{_mandir}/man1/glib-genmarshal.1*
+#%{_mandir}/man1/glib-gettextize.1*
+#%{_mandir}/man1/glib-mkenums.1*
+#%{_mandir}/man1/gobject-query.1*
+#%{_mandir}/man1/gtester-report.1*
+#%{_mandir}/man1/gtester.1*
+#%{_mandir}/man1/gdbus-codegen.1*
+#%{_mandir}/man1/glib-compile-resources.1*
+#%{_mandir}/man1/gresource.1*
 %{_datadir}/gdb/
 %{_datadir}/gettext/
-%{_datadir}/systemtap/
-
-%files doc
-%{_datadir}/gtk-doc/
+#%{_datadir}/systemtap/
 
 %files static
 %{_libdir}/libgio-2.0.a

@@ -87,7 +87,7 @@ This package contains the reference manual for %{name}.
 rm -fr doc/html
 
 # Update Doxyfile.
-doxygen -s -u doc/Doxyfile.in
+#doxygen -s -u doc/Doxyfile.in
 
 
 %build
@@ -100,14 +100,14 @@ doxygen -s -u doc/Doxyfile.in
   -DENABLE_RDRAND:BOOL=ON            \
   -DENABLE_THREADING:BOOL=ON         \
   -G Ninja
-%cmake_build --target all doc
+%cmake_build --target all
 
 
 %install
 %cmake_install
 
 # Documentation
-mkdir -p %{buildroot}%{_pkgdocdir}
+mkdir -p %{buildroot}%{_pkgdocdir} %{__cmake_builddir}/doc/html
 cp -a %{__cmake_builddir}/doc/html ChangeLog README README.* \
   %{buildroot}%{_pkgdocdir}
 hardlink -cfv %{buildroot}%{_pkgdocdir}

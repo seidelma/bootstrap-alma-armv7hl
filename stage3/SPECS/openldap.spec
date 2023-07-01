@@ -233,7 +233,7 @@ pushd openldap-%{version}
 	\
 	--libexecdir=%{_libdir}
 
-%make_build
+%make_build SOELIM=/usr/bin/true
 popd
 
 pushd openldap-ppolicy-check-password-%{check_password_version}
@@ -247,7 +247,7 @@ popd
 mkdir -p %{buildroot}%{_libdir}/
 
 pushd openldap-%{version}
-%make_install STRIP_OPTS=""
+%make_install SOELIM=/usr/bin/true STRIP_OPTS=""
 popd
 
 # install check_password module

@@ -781,7 +781,7 @@ install -pm 644 contrib/completion/git-prompt.sh \
     %{buildroot}%{_datadir}/git-core/contrib/completion/
 
 # install git-gui .desktop file
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE12}
+#desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE12}
 
 # symlink git-citool to git-gui if they are identical
 pushd %{buildroot}%{gitexecdir} >/dev/null
@@ -1028,7 +1028,6 @@ rmdir --ignore-fail-on-non-empty "$testdir"
 %files gui
 %{gitexecdir}/git-gui*
 %{gitexecdir}/git-citool
-%{_datadir}/applications/*git-gui.desktop
 %{_datadir}/git-gui/
 %{_pkgdocdir}/git-gui.txt
 %{_pkgdocdir}/git-citool.txt

@@ -205,8 +205,8 @@ make -k check
 %{_bindir}/gpgparsemail
 %{_bindir}/gpgtar
 %{_bindir}/g13
-%{_bindir}/dirmngr
-%{_bindir}/dirmngr-client
+#%{_bindir}/dirmngr
+#%{_bindir}/dirmngr-client
 %if %{with unversioned_gpg}
 %{_bindir}/gpg
 %{_bindir}/gpgv

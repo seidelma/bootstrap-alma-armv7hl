@@ -293,8 +293,8 @@ LLVM's modified googletest sources.
 %endif
 	\
 	-DLLVM_INCLUDE_DOCS:BOOL=ON \
-	-DLLVM_BUILD_DOCS:BOOL=ON \
-	-DLLVM_ENABLE_SPHINX:BOOL=ON \
+	-DLLVM_BUILD_DOCS:BOOL=OFF \
+	-DLLVM_ENABLE_SPHINX:BOOL=OFF \
 	-DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
 	\
 %if %{without compat_build}
@@ -349,7 +349,7 @@ mkdir -p %{buildroot}/%{_bindir}
 %if %{without compat_build}
 
 # Fix some man pages
-ln -s llvm-config.1 %{buildroot}%{_mandir}/man1/llvm-config%{exec_suffix}-%{__isa_bits}.1
+#ln -s llvm-config.1 %{buildroot}%{_mandir}/man1/llvm-config%{exec_suffix}-%{__isa_bits}.1
 
 # Install binaries needed for lit tests
 %global test_binaries llvm-isel-fuzzer llvm-opt-fuzzer
@@ -496,8 +496,8 @@ fi
 
 %files
 %license LICENSE.TXT
-%exclude %{_mandir}/man1/llvm-config*
-%{_mandir}/man1/*
+#%exclude %{_mandir}/man1/llvm-config*
+#%{_mandir}/man1/*
 %{_bindir}/*
 
 %exclude %{_bindir}/llvm-config%{exec_suffix}
@@ -547,7 +547,7 @@ fi
 
 %ghost %{_bindir}/llvm-config%{exec_suffix}
 %{pkg_bindir}/llvm-config%{exec_suffix}-%{__isa_bits}
-%{_mandir}/man1/llvm-config*
+#%{_mandir}/man1/llvm-config*
 
 %if %{without compat_build}
 %{_includedir}/llvm
@@ -571,7 +571,7 @@ fi
 
 %files doc
 %license LICENSE.TXT
-%doc %{_pkgdocdir}/html
+#%doc %{_pkgdocdir}/html
 
 %files static
 %license LICENSE.TXT

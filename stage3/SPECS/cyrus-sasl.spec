@@ -3,7 +3,7 @@
 %global homedir     /run/saslauthd
 
 %global _plugindir2 %{_libdir}/sasl2
-%global bootstrap_cyrus_sasl 0
+%global bootstrap_cyrus_sasl 1
 %global gdbm_db_file /etc/sasl2/sasldb2
 
 Summary: The Cyrus SASL library
@@ -131,13 +131,13 @@ The %{name}-ntlm package contains the Cyrus SASL plugin which supports
 the NTLM authentication scheme.
 
 # This would more appropriately be named cyrus-sasl-auxprop-sql.
-%package sql
-Requires: %{name}-lib%{?_isa} = %{version}-%{release}
-Summary: SQL auxprop support for Cyrus SASL
+#%package sql
+#Requires: %{name}-lib%{?_isa} = %{version}-%{release}
+#Summary: SQL auxprop support for Cyrus SASL
 
-%description sql
-The %{name}-sql package contains the Cyrus SASL plugin which supports
-using a RDBMS for storing shared secrets.
+#%description sql
+#The %{name}-sql package contains the Cyrus SASL plugin which supports
+#using a RDBMS for storing shared secrets.
 
 %if ! %{bootstrap_cyrus_sasl}
 # This was *almost* named cyrus-sasl-auxprop-ldapdb, but that's a lot of typing.
@@ -185,7 +185,8 @@ the GS2 authentication scheme.
 %patch105 -p1 -b .autoconf270
 %patch106 -p1 -b .nostrncpy
 %patch107 -p1 -b .plaintests
-%patch108 -p1 -b .frombdb
+# Causes build to fail on armv7 with "relocation R_ARM_MOVW_ABS_NC against `a local symbol' can not be used when making a shared object; recompile with -fPIC"
+#%patch108 -p1 -b .frombdb
 %patch500 -p1 -b .coverity
 %patch501 -p1 -b .digestmd5
 %patch502 -p1 -b .ossl3
@@ -215,24 +216,24 @@ if pkg-config openssl ; then
 fi
 
 # Find the MySQL libraries used needed by the SQL auxprop plugin.
-INC_DIR="`mysql_config --include`"
-if test x"$INC_DIR" != "x-I%{_includedir}"; then
-        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
-fi
-LIB_DIR="`mysql_config --libs | sed -e 's,-[^L][^ ]*,,g' -e 's,^ *,,' -e 's, *$,,' -e 's,  *, ,g'`"
-if test x"$LIB_DIR" != "x-L%{_libdir}"; then
-        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
-fi
+#INC_DIR="`mysql_config --include`"
+#if test x"$INC_DIR" != "x-I%{_includedir}"; then
+#        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
+#fi
+#LIB_DIR="`mysql_config --libs | sed -e 's,-[^L][^ ]*,,g' -e 's,^ *,,' -e 's, *$,,' -e 's,  *, ,g'`"
+#if test x"$LIB_DIR" != "x-L%{_libdir}"; then
+#        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
+#fi
 
 # Find the PostgreSQL libraries used needed by the SQL auxprop plugin.
-INC_DIR="-I`pg_config --includedir`"
-if test x"$INC_DIR" != "x-I%{_includedir}"; then
-        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
-fi
-LIB_DIR="-L`pg_config --libdir`"
-if test x"$LIB_DIR" != "x-L%{_libdir}"; then
-        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
-fi
+#INC_DIR="-I`pg_config --includedir`"
+#if test x"$INC_DIR" != "x-I%{_includedir}"; then
+#        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
+#fi
+#LIB_DIR="-L`pg_config --libdir`"
+#if test x"$LIB_DIR" != "x-L%{_libdir}"; then
+#        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
+#fi
 
 CFLAGS="$RPM_OPT_FLAGS $CFLAGS $CPPFLAGS -fPIC -pie -Wl,-z,relro -Wl,-z,now"; export CFLAGS
 
@@ -268,7 +269,6 @@ echo "$LDFLAGS"
 %if ! %{bootstrap_cyrus_sasl}
         --enable-ldapdb \
 %endif
-        --enable-sql --with-mysql=yes --with-pgsql=yes \
         --without-sqlite \
         "$@"
         # --enable-auth-sasldb -- EXPERIMENTAL
@@ -280,20 +280,19 @@ make -C sample
 pushd lib
 ../libtool --mode=link %{__cc} -o sasl2-shared-mechlist -I../include $CFLAGS %{SOURCE7} $LDFLAGS ./libsasl2.la
 
-
 %install
 test "$RPM_BUILD_ROOT" != "/" && rm -rf $RPM_BUILD_ROOT
 
+# make install fails to exec nroff to create saslauthd.8, then succeeds on subsequent runs because it touched an empty file. oof.
+touch saslauthd/saslauthd.8
 make install DESTDIR=$RPM_BUILD_ROOT sasldir=%{_plugindir2}
 make install DESTDIR=$RPM_BUILD_ROOT sasldir=%{_plugindir2} -C plugins
-
+echo "finished make install"
 install -m755 -d $RPM_BUILD_ROOT%{_bindir}
 ./libtool --mode=install \
 install -m755 sample/client $RPM_BUILD_ROOT%{_bindir}/sasl2-sample-client
 ./libtool --mode=install \
 install -m755 sample/server $RPM_BUILD_ROOT%{_bindir}/sasl2-sample-server
-#Migration tool should be removed from RHEL10
-mv $RPM_BUILD_ROOT%{_sbindir}/cyrusbdb2current $RPM_BUILD_ROOT%{_bindir}/cyrusbdb2current
 ./libtool --mode=install \
 install -m755 saslauthd/testsaslauthd $RPM_BUILD_ROOT%{_sbindir}/testsaslauthd
 
@@ -361,7 +360,7 @@ getent passwd %{username} >/dev/null || useradd -r -g %{username} -d %{homedir} 
 %{_plugindir2}/*sasldb*.so*
 %{_sbindir}/saslpasswd2
 %{_sbindir}/sasldblistusers2
-%{_bindir}/cyrusbdb2current
+#%{_bindir}/cyrusbdb2current
 
 %files plain
 %{_plugindir2}/*plain*.so*
@@ -379,8 +378,8 @@ getent passwd %{username} >/dev/null || useradd -r -g %{username} -d %{homedir} 
 %files ntlm
 %{_plugindir2}/*ntlm*.so*
 
-%files sql
-%{_plugindir2}/*sql*.so*
+#%files sql
+#%{_plugindir2}/*sql*.so*
 
 %files gssapi
 %{_plugindir2}/*gssapi*.so*

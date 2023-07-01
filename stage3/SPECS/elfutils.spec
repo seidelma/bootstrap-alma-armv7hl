@@ -266,7 +266,7 @@ trap 'cat config.log' EXIT
 %if 0%{?centos} >= 8
 %configure CFLAGS="$RPM_OPT_FLAGS -fexceptions" --enable-debuginfod-urls=https://debuginfod.centos.org/
 %else
-%configure CFLAGS="$RPM_OPT_FLAGS -fexceptions"
+%configure CFLAGS="$RPM_OPT_FLAGS -fexceptions" --disable-debuginfod
 %endif
 trap '' EXIT
 %make_build
@@ -405,11 +405,11 @@ fi
 %{_libdir}/libdebuginfod.so
 
 %files debuginfod
-%{_bindir}/debuginfod
+#%{_bindir}/debuginfod
 %config(noreplace) %{_sysconfdir}/sysconfig/debuginfod
 %{_unitdir}/debuginfod.service
 %{_sysconfdir}/sysconfig/debuginfod
-%{_mandir}/man8/debuginfod.8*
+#%{_mandir}/man8/debuginfod.8*
 
 %dir %attr(0700,debuginfod,debuginfod) %{_localstatedir}/cache/debuginfod
 %ghost %attr(0600,debuginfod,debuginfod) %{_localstatedir}/cache/debuginfod/debuginfod.sqlite

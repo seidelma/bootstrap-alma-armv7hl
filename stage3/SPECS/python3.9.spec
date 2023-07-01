@@ -788,7 +788,7 @@ version once Python %{pybasever} is stable.
 # ======================================================
 
 %prep
-%gpgverify -k2 -s1 -d0
+#%gpgverify -k2 -s1 -d0
 %autosetup -S git_am -N -n Python-%{upstream_version}
 
 # Apply patches up to 188
@@ -908,7 +908,6 @@ BuildPython() {
   --with-system-expat \
   --with-system-ffi \
   --enable-loadable-sqlite-extensions \
-  --with-dtrace \
   --with-lto \
   --with-ssl-default-suites=openssl \
   --with-builtin-hashlib-hashes=blake2 \
@@ -1072,12 +1071,12 @@ install -D -m 0644 Lib/idlelib/Icons/idle_16.png %{buildroot}%{_datadir}/icons/h
 install -D -m 0644 Lib/idlelib/Icons/idle_32.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/idle3.png
 install -D -m 0644 Lib/idlelib/Icons/idle_48.png %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/idle3.png
 install -D -m 0644 Lib/idlelib/Icons/idle_256.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/idle3.png
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE10}
+install -D -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/applications/idle3.desktop
 
 # Install and validate appdata file
 mkdir -p %{buildroot}%{_metainfodir}
 cp -a %{SOURCE11} %{buildroot}%{_metainfodir}
-appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/idle3.appdata.xml
+#appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/idle3.appdata.xml
 %endif
 
 # Make sure distutils looks at the right pyconfig.h file
@@ -1639,7 +1638,7 @@ CheckPython optimized
 %if %{without flatpackage}
 %exclude %{pylibdir}/tkinter/test
 %endif
-%{dynload_dir}/_tkinter.%{SOABI_optimized}.so
+#%{dynload_dir}/_tkinter.%{SOABI_optimized}.so
 %{pylibdir}/turtle.py
 %{pylibdir}/__pycache__/turtle*%{bytecode_suffixes}
 %dir %{pylibdir}/turtledemo
@@ -1787,7 +1786,7 @@ CheckPython optimized
 # shebang if needed
 
 # Analog  of the tkinter subpackage's files:
-%{dynload_dir}/_tkinter.%{SOABI_debug}.so
+#%{dynload_dir}/_tkinter.%{SOABI_debug}.so
 
 # Analog  of the -test subpackage's files:
 %{dynload_dir}/_ctypes_test.%{SOABI_debug}.so

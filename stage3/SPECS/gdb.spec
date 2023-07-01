@@ -426,24 +426,24 @@ and printing their data.
 This package provides a program that allows you to run GDB on a different
 machine than the one which is running the program being debugged.
 
-%package doc
-Summary: Documentation for GDB (the GNU source-level debugger)
-License: GFDL
-BuildArch: noarch
-%if 0%{?scl:1}
+#%package doc
+#Summary: Documentation for GDB (the GNU source-level debugger)
+#License: GFDL
+#BuildArch: noarch
+#%if 0%{?scl:1}
 # As of F-28, packages won't need to call /sbin/install-info by hand
 # anymore.  We make an exception for DTS here.
 # https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/MP2QVJZBOJZEOQO2G7UB2HLXKXYPF2G5/
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
-%endif
+#Requires(post): /sbin/install-info
+#Requires(preun): /sbin/install-info
+#%endif
 
-%description doc
-GDB, the GNU debugger, allows you to debug programs written in C, C++,
-Java, and other languages, by executing them in a controlled fashion
-and printing their data.
+#%description doc
+#GDB, the GNU debugger, allows you to debug programs written in C, C++,
+#Java, and other languages, by executing them in a controlled fashion
+#and printing their data.
 
-This package provides INFO, HTML and PDF user manual for GDB.
+#This package provides INFO, HTML and PDF user manual for GDB.
 
 %prep
 %setup -q -n %{gdb_src}
@@ -788,8 +788,8 @@ done	# fprofile
 
 cd %{gdb_build}
 
-%make_build \
-     -C gdb/doc {gdb,annotate}{.info,/index.html,.pdf} MAKEHTMLFLAGS=--no-split MAKEINFOFLAGS=--no-split V=1
+#%make_build \
+#     -C gdb/doc {gdb,annotate}{.info,/index.html,.pdf} MAKEHTMLFLAGS=--no-split MAKEINFOFLAGS=--no-split V=1
 
 # Copy the <sourcetree>/gdb/NEWS file to the directory above it.
 cp $RPM_BUILD_DIR/%{gdb_src}/gdb/NEWS $RPM_BUILD_DIR/%{gdb_src}
@@ -1052,6 +1052,10 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/elinos.py
 rm -f $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit/wrs-linux.py
 rmdir $RPM_BUILD_ROOT%{_datadir}/gdb/system-gdbinit
 
+# XXX: stage3 gdb build
+rm -rfv $RPM_BUILD_ROOT%{_infodir}/*
+rm -rfv $RPM_BUILD_ROOT%{_libdir}/debug/*
+
 %files
 # File must begin with "/": {GFDL,COPYING3,COPYING,COPYING.LIB,COPYING3.LIB}
 %if 0%{!?el6:1}
@@ -1124,38 +1128,38 @@ done
 %endif # 0%{!?rhel:1}
 %endif # 0%{!?_without_python:1}
 
-%files doc
-%doc %{gdb_build}/gdb/doc/{gdb,annotate}.{html,pdf}
-%{_infodir}/annotate.info*
-%{_infodir}/gdb.info*
+#%files doc
+#%doc %{gdb_build}/gdb/doc/{gdb,annotate}.{html,pdf}
+#%{_infodir}/annotate.info*
+#%{_infodir}/gdb.info*
 
-%if 0%{?scl:1}
+#%if 0%{?scl:1}
 # As of F-28, packages won't need to call /sbin/install-info by hand
 # anymore.  We make an exception for DTS here.
 # https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/MP2QVJZBOJZEOQO2G7UB2HLXKXYPF2G5/
 
-%post doc
+#%post doc
 # This step is part of the installation of the RPM. Not to be confused
 # with the 'make install ' of the build (rpmbuild) process.
 
 # For --excludedocs:
-if [ -e %{_infodir}/gdb.info.gz ]
-then
-  /sbin/install-info --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
-  /sbin/install-info --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
-fi
+#if [ -e %{_infodir}/gdb.info.gz ]
+#then
+#  /sbin/install-info --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
+#  /sbin/install-info --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
+#fi
 
-%preun doc
-if [ $1 = 0 ]
-then
+#%preun doc
+#if [ $1 = 0 ]
+#then
   # For --excludedocs:
-  if [ -e %{_infodir}/gdb.info.gz ]
-  then
-    /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
-    /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
-  fi
-fi
-%endif
+#  if [ -e %{_infodir}/gdb.info.gz ]
+#  then
+#    /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
+#    /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
+#  fi
+#fi
+#%endif
 
 %changelog
 * Tue May 24 2022 Keith Seitz <keiths@redhat.com> - 10.2-10.el9

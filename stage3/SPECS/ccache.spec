@@ -50,7 +50,7 @@ sed -e 's|@LIBDIR@|%{_libdir}|g' -e 's|@CACHEDIR@|%{_var}/cache/ccache|g' \
 
 
 %build
-%cmake
+%cmake -DREDIS_STORAGE_BACKEND=OFF
 %cmake_build
 %cmake_build --target doc
 

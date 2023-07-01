@@ -16,8 +16,8 @@ BuildRequires:  gcc
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  libffi-devel
 BuildRequires:  gettext
-BuildRequires:  gtk-doc
 BuildRequires:  meson
+#BuildRequires:  gtk-doc
 BuildRequires:  systemd-devel
 BuildRequires:  bash-completion
 # Work around for https://bugzilla.redhat.com/show_bug.cgi?id=1497147
@@ -80,7 +80,7 @@ gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %build
 # These paths are the source paths that  come from the plan here:
 # https://fedoraproject.org/wiki/Features/SharedSystemCertificates:SubTasks
-%meson -Dgtk_doc=true -Dman=true -Dtrust_paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source
+%meson -Dtrust_paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source
 %meson_build
 
 %install
@@ -123,16 +123,16 @@ fi
 %{_libdir}/libp11-kit.so.*
 %{_libdir}/p11-kit-proxy.so
 %{_libexecdir}/p11-kit/p11-kit-remote
-%{_mandir}/man1/trust.1.gz
-%{_mandir}/man8/p11-kit.8.gz
-%{_mandir}/man5/pkcs11.conf.5.gz
+#%{_mandir}/man1/trust.1.gz
+#%{_mandir}/man8/p11-kit.8.gz
+#%{_mandir}/man5/pkcs11.conf.5.gz
 %{_datadir}/bash-completion/completions/p11-kit
 
 %files devel
 %{_includedir}/p11-kit-1/
 %{_libdir}/libp11-kit.so
 %{_libdir}/pkgconfig/p11-kit-1.pc
-%doc %{_datadir}/gtk-doc/
+#%doc %{_datadir}/gtk-doc/
 
 %files trust
 %{_bindir}/trust

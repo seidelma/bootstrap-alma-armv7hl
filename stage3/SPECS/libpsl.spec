@@ -93,7 +93,6 @@ sed -i -e "1s|#!.*|#!%{__python3}|" src/psl-make-dafsa
 %configure --disable-silent-rules \
            --disable-static       \
            --enable-man           \
-           --enable-gtk-doc       \
            --enable-builtin=libicu \
            --enable-runtime=libidn2 \
            --with-psl-distfile=%{_datadir}/publicsuffix/public_suffix_list.dafsa  \
@@ -131,7 +130,7 @@ make check || cat tests/test-suite.log
 %{_includedir}/libpsl.h
 %{_libdir}/libpsl.so
 %{_libdir}/pkgconfig/libpsl.pc
-%{_mandir}/man3/libpsl.3*
+#%{_mandir}/man3/libpsl.3*
 
 %files -n psl
 %doc AUTHORS NEWS

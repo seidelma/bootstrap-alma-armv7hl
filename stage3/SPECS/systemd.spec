@@ -690,24 +690,6 @@ systemd-oomd is a system service that uses cgroups-v2 and pressure stall
 information (PSI) to monitor and take action on processes before an OOM
 occurs in kernel space.
 
-%package standalone-tmpfiles
-Summary:       Standalone tmpfiles binary for use in non-systemd systems
-RemovePathPostfixes: .standalone
-
-%description standalone-tmpfiles
-Standalone tmpfiles binary with no dependencies on the systemd-shared library
-or other libraries from systemd-libs. This package conflicts with the main
-systemd package and is meant for use in non-systemd systems.
-
-%package standalone-sysusers
-Summary:       Standalone sysusers binary for use in non-systemd systems
-RemovePathPostfixes: .standalone
-
-%description standalone-sysusers
-Standalone sysusers binary with no dependencies on the systemd-shared library
-or other libraries from systemd-libs. This package conflicts with the main
-systemd package and is meant for use in non-systemd systems.
-
 %prep
 %autosetup -n %{?commit:%{name}%{?stable:-stable}-%{commit}}%{!?commit:%{name}%{?stable:-stable}-%{version_no_tilde}} -p1
 
@@ -719,88 +701,10 @@ CONFIGURE_OPTS=(
         -Dmode=release
         -Dsysvinit-path=/etc/rc.d/init.d
         -Drc-local=/etc/rc.d/rc.local
-        -Dntp-servers='0.%{ntpvendor}.pool.ntp.org 1.%{ntpvendor}.pool.ntp.org 2.%{ntpvendor}.pool.ntp.org 3.%{ntpvendor}.pool.ntp.org'
         -Ddns-servers=
         -Duser-path=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
         -Dservice-watchdog=3min
         -Ddev-kvm-mode=0666
-        -Dkmod=true
-        -Dxkbcommon=true
-        -Dblkid=true
-        -Dfdisk=true
-        -Dseccomp=true
-        -Dima=true
-        -Dselinux=true
-        -Dapparmor=false
-        -Dpolkit=true
-        -Dxz=true
-        -Dzlib=true
-        -Dbzip2=true
-        -Dlz4=true
-        -Dzstd=true
-        -Dpam=true
-        -Dacl=true
-        -Dsmack=true
-        -Dopenssl=true
-        -Dcryptolib=openssl
-        -Dp11kit=true
-        -Dgcrypt=true
-        -Daudit=true
-        -Delfutils=true
-%if %{without bootstrap}
-        -Dlibcryptsetup=true
-%else
-        -Dlibcryptsetup=false
-%endif
-        -Delfutils=true
-        -Dpwquality=false
-        -Dqrencode=false
-        -Dgnutls=true
-        -Dmicrohttpd=true
-        -Dlibidn2=true
-        -Dlibiptc=false
-        -Dlibcurl=true
-        -Dlibfido2=false
-        -Dgnu-efi=false
-        -Dtpm=true
-        -Dtpm2=true
-        -Dhwdb=true
-        -Dsysusers=true
-        -Dstandalone-binaries=true
-        -Ddefault-kill-user-processes=false
-        -Dtests=unsafe
-        -Dinstall-tests=false
-        -Dtty-gid=5
-        -Dusers-gid=100
-        -Dnobody-user=nobody
-        -Dnobody-group=nobody
-        -Dcompat-mutable-uid-boundaries=true
-        -Dsplit-usr=false
-        -Dsplit-bin=true
-%if %{with lto}
-        -Db_lto=true
-%else
-        -Db_lto=false
-%endif
-        -Db_ndebug=false
-        -Dman=true
-        -Dversion-tag=%{version}-%{release}
-%if 0%{?fedora}
-        -Dfallback-hostname=fedora
-%else
-        -Dfallback-hostname=localhost
-%endif
-        -Ddefault-dnssec=no
-        # https://bugzilla.redhat.com/show_bug.cgi?id=1867830
-        -Ddefault-mdns=no
-        -Ddefault-llmnr=resolve
-        -Doomd=true
-        -Dtimesyncd=false
-        -Dhomed=false
-        -Duserdb=false
-        -Dportabled=false
-        -Dnetworkd=false
-        -Dsupport-url=https://access.redhat.com/support
 )
 
 %if %{without lto}
@@ -1185,6 +1089,32 @@ getent passwd systemd-oom &>/dev/null || useradd -r -l -g systemd-oom -d / -s /s
 %ghost %dir %attr(0755,-,-) /etc/systemd/system/system-update.target.wants
 %ghost %dir %attr(0755,-,-) /etc/systemd/system/timers.target.wants
 %ghost %dir %attr(0755,-,-) /var/lib/rpm-state/systemd
+# XXX: unpackaged stage3 files
+   /etc/systemd/networkd.conf
+   /usr/bin/networkctl
+   /usr/lib/systemd/network/80-6rd-tunnel.network
+   /usr/lib/systemd/network/80-container-host0.network
+   /usr/lib/systemd/network/80-container-ve.network
+   /usr/lib/systemd/network/80-container-vz.network
+   /usr/lib/systemd/network/80-vm-vt.network
+   /usr/lib/systemd/network/80-wifi-adhoc.network
+   /usr/lib/systemd/network/80-wifi-ap.network.example
+   /usr/lib/systemd/network/80-wifi-station.network.example
+   /usr/lib/systemd/system/systemd-networkd-wait-online.service
+   /usr/lib/systemd/system/systemd-networkd.service
+   /usr/lib/systemd/system/systemd-networkd.socket
+   /usr/lib/systemd/systemd-networkd
+   /usr/lib/systemd/systemd-networkd-wait-online
+   /usr/share/bash-completion/completions/networkctl
+   /usr/share/dbus-1/interfaces/org.freedesktop.network1.DHCPServer.xml
+   /usr/share/dbus-1/interfaces/org.freedesktop.network1.Link.xml
+   /usr/share/dbus-1/interfaces/org.freedesktop.network1.Manager.xml
+   /usr/share/dbus-1/interfaces/org.freedesktop.network1.Network.xml
+   /usr/share/dbus-1/system-services/org.freedesktop.network1.service
+   /usr/share/dbus-1/system.d/org.freedesktop.network1.conf
+   /usr/share/polkit-1/actions/org.freedesktop.network1.policy
+   /usr/share/polkit-1/rules.d/systemd-networkd.rules
+   /usr/share/zsh/site-functions/_networkctl
 
 %files libs -f .file-list-libs
 %license LICENSE.LGPL2.1
@@ -1204,10 +1134,6 @@ getent passwd systemd-oom &>/dev/null || useradd -r -l -g systemd-oom -d / -s /s
 %files resolved -f .file-list-resolved
 
 %files oomd -f .file-list-oomd
-
-%files standalone-tmpfiles -f .file-list-standalone-tmpfiles
-
-%files standalone-sysusers -f .file-list-standalone-sysusers
 
 %changelog
 * Fri Sep 23 2022 systemd maintenance team <systemd-maint@redhat.com> - 250-12

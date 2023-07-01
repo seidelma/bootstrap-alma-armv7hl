@@ -52,14 +52,14 @@ sed -i 's/py\.test/pytest/' Makefile
 
 %build
 make PYTHON=%{__python3} build
-make PYTHON=%{__python3} SPHINX_BUILD=sphinx-build-3 sphinx-html
-rm -r build/html/.buildinfo build/html/.doctrees
+#make PYTHON=%{__python3} SPHINX_BUILD=sphinx-build-3 sphinx-html
+#rm -r build/html/.buildinfo build/html/.doctrees
 
 %install
 %make_install PYTHON=%{__python3}
 mkdir -p %{buildroot}%{_pkgdocdir}
-cp -rv build/html %{buildroot}%{_pkgdocdir}/
-ln -vsf %{_jsdir}/jquery/latest/jquery.min.js %{buildroot}%{_pkgdocdir}/html/_static/jquery.js
+#cp -rv build/html %{buildroot}%{_pkgdocdir}/
+#ln -vsf %{_jsdir}/jquery/latest/jquery.min.js %{buildroot}%{_pkgdocdir}/html/_static/jquery.js
 cp -p README.md NEWS %{buildroot}%{_pkgdocdir}/
 
 %check
@@ -76,7 +76,7 @@ make PYTHON=%{__python3} check
 %{python3_sitearch}/systemd_python*.egg-info
 
 %files doc
-%doc %{_pkgdocdir}/html
+#%doc %{_pkgdocdir}/html
 
 %changelog
 * Tue Aug 10 2021 Mohan Boddu <mboddu@redhat.com> - 234-18

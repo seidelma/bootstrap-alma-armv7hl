@@ -96,28 +96,6 @@ BuildRequires:  cmake
 %description -n %{name}pp-devel
 %{summary}
 
-%package -n q%{name}
-Summary:        Qt API bindings/wrapper for GPGME
-Requires:       %{name}pp%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-BuildRequires:  pkgconfig(Qt5Core)
-BuildRequires:  pkgconfig(Qt5Test)
-
-%description -n q%{name}
-%{summary}.
-
-%package -n q%{name}-devel
-Summary:        Development libraries and header files for %{name}
-# before libqgpgme.so symlink was moved to avoid conflict
-Conflicts:      kdepimlibs-devel < 4.14.10-17
-Requires:       q%{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       %{name}pp-devel%{?_isa}
-# For automatic provides
-BuildRequires:  cmake
-
-%description -n q%{name}-devel
-%{summary}.
-
 %package -n python3-gpg
 Summary:        %{name} bindings for Python 3
 %{?python_provide:%python_provide python3-gpg}
@@ -143,7 +121,7 @@ sed -i 's/3.8/%{python3_version}/g' configure
 %build
 # People neeed to learn that you can't run autogen.sh anymore
 #./autogen.sh
-%configure --disable-static --disable-silent-rules --enable-languages=cpp,qt,python
+%configure --disable-static --disable-silent-rules --enable-languages=cpp,python
 %make_build
 
 %install
@@ -168,7 +146,6 @@ install -m644 -p -D %{SOURCE2} %{buildroot}%{_includedir}/gpgme.h
 chrpath -d %{buildroot}%{_bindir}/%{name}-tool
 chrpath -d %{buildroot}%{_bindir}/%{name}-json
 chrpath -d %{buildroot}%{_libdir}/lib%{name}pp.so*
-chrpath -d %{buildroot}%{_libdir}/libq%{name}.so*
 
 # autofoo installs useless stuff for uninstall
 rm -vf %{buildroot}%{python2_sitelib}/gpg/install_files.txt
@@ -206,16 +183,6 @@ make check
 %{_includedir}/%{name}++/
 %{_libdir}/lib%{name}pp.so
 %{_libdir}/cmake/Gpgmepp/
-
-%files -n q%{name}
-%doc lang/qt/README
-%{_libdir}/libq%{name}.so.7*
-
-%files -n q%{name}-devel
-%{_includedir}/q%{name}/
-%{_includedir}/QGpgME/
-%{_libdir}/libq%{name}.so
-%{_libdir}/cmake/QGpgme/
 
 %files -n python3-gpg
 %doc lang/python/README

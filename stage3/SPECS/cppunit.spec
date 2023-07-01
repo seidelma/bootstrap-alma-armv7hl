@@ -39,7 +39,7 @@ the popular doxygen documentation generation tool.
 %autosetup -p1
 
 %build
-%configure --enable-doxygen --disable-static --disable-silent-rules
+%configure --disable-doxygen --disable-static --disable-silent-rules
 sed -i \
     -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
@@ -81,7 +81,7 @@ mv __dist-examples __dist-examples-dir/examples
 %files doc
 %license COPYING
 %doc __dist-examples-dir/examples/
-%doc doc/html
+#%doc doc/html
 
 %changelog
 * Wed Jan 26 2022 Caolán McNamara <caolanm@redhat.com> - 1.15.1-8

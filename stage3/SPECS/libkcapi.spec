@@ -347,13 +347,14 @@ EOF
 %if %{with doc}
 %make_build all doc
 %else
-%make_build all man
+%make_build all
 %endif
 
 
 %install
 %make_install
 
+rm -rf %{buildroot}%{_mandir}
 # Install sysctl.d preset.
 %{__mkdir_p} %{buildroot}%{_sysctldir}
 %{__install} -Dpm 0644 -t %{buildroot}%{_sysctldir} \
@@ -462,7 +463,7 @@ popd
 %doc %{_pkgdocdir}/CHANGES.md
 %doc %{_pkgdocdir}/TODO
 %{_includedir}/kcapi.h
-%{_mandir}/man3/kcapi_*.3.*
+#%{_mandir}/man3/kcapi_*.3.*
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 
@@ -502,7 +503,7 @@ popd
 
 %files          tools
 %{_bindir}/kcapi*
-%{_mandir}/man1/kcapi*.1.*
+#%{_mandir}/man1/kcapi*.1.*
 
 
 %if %{with test_package}

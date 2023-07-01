@@ -246,6 +246,7 @@ for type in separate single; do
              --enable-install-program=arch \
              --enable-no-install-program=kill,uptime \
              --with-tty-group \
+             FORCE_UNSAFE_CONFIGURE=1 \
              DEFAULT_POSIX2_VERSION=200112 alternative=199209 || :
   %make_build all V=1
 

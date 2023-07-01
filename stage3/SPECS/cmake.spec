@@ -345,7 +345,7 @@ mv %{buildroot}%{_emacs_sitelispdir}/%{name}-mode.el %{buildroot}%{_emacs_siteli
 %{_emacs_bytecompile} %{buildroot}%{_emacs_sitelispdir}/%{name}/%{name}-mode.el
 install -p -m 0644 %{SOURCE1} %{buildroot}%{_emacs_sitestartdir}
 %else
-rm -f %{buildroot}%{_emacs_sitelispdir}
+rm -rf %{buildroot}%{_emacs_sitelispdir}
 %endif
 # RPM macros
 install -p -m0644 -D %{SOURCE2} %{buildroot}%{rpm_macros_dir}/macros.%{name}

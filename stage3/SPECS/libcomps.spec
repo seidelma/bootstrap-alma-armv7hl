@@ -73,7 +73,7 @@ popd
 pushd build-doc
   %cmake ../libcomps/
   make %{?_smp_mflags} docs
-  make %{?_smp_mflags} pydocs
+  #make %{?_smp_mflags} pydocs
 popd
 
 %install
@@ -105,10 +105,10 @@ popd
 %{_includedir}/%{name}/
 
 %files doc
-%doc build-doc/docs/libcomps-doc/html
+#%doc build-doc/docs/libcomps-doc/html
 
 %files -n python-%{name}-doc
-%doc build-doc/src/python/docs/html
+#%doc build-doc/src/python/docs/html
 
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}/

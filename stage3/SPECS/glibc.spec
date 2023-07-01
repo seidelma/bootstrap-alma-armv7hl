@@ -1493,8 +1493,9 @@ rpm_inherit_flags \
 	"-mtune=z14" \
 	"-mtune=z15" \
 	"-mtune=zEC12" \
+%if %{with annobin}
 	"-specs=/usr/lib/rpm/redhat/redhat-annobin-cc1" \
-
+%endif
 # Use the RHEL 8 baseline for the early dynamic loader code, so that
 # running on too old CPUs results in a diagnostic.
 %if 0%{?rhel} >= 9
@@ -1515,7 +1516,11 @@ rpm_inherit_flags \
 # skipped in annobin annotations.  (The -specs= variant of activating
 # annobin does not work here because of flag ordering issues.)
 # See <https://bugzilla.redhat.com/show_bug.cgi?id=1668822>.
+BuildFlagsNonshared=""
+
+%if %{with annobin}
 BuildFlagsNonshared="-fplugin=annobin -fplugin-arg-annobin-disable -Wa,--generate-missing-build-notes=yes"
+%endif
 
 # Special flag to enable annobin annotations for statically linked
 # assembler code.  Needs to be passed to make; not preserved by
@@ -1553,7 +1558,9 @@ build()
 		--build=%{target} \
 		--enable-stack-protector=strong \
 		--enable-tunables \
+%if %{with systemtap}
 		--enable-systemtap \
+%endif
 		${core_with_options} \
 		%{?glibc_rtld_early_cflags:--with-rtld-early-cflags=%glibc_rtld_early_cflags} \
 %ifarch x86_64 %{ix86}

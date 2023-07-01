@@ -60,6 +60,13 @@ to enable or disable the system FIPS mode.
 %autopatch -p1
 
 %build
+sed -i \
+  -e 's/asciidoc.py/echo asciidoc.py/g' \
+  -e 's/xsltproc/echo xsltproc/g'       \
+  -e '/man7/s/^/#/g'                    \
+  -e '/man8/s/^/#/g'                    \
+Makefile
+
 %make_build
 
 %install
@@ -162,7 +169,7 @@ end
 %ghost %{_sysconfdir}/crypto-policies/state/current
 %ghost %{_sysconfdir}/crypto-policies/state/CURRENT.pol
 
-%{_mandir}/man7/crypto-policies.7*
+#%{_mandir}/man7/crypto-policies.7*
 %{_datarootdir}/crypto-policies/LEGACY
 %{_datarootdir}/crypto-policies/DEFAULT
 %{_datarootdir}/crypto-policies/FUTURE
@@ -176,13 +183,13 @@ end
 
 %files scripts
 %{_bindir}/update-crypto-policies
-%{_mandir}/man8/update-crypto-policies.8*
+#%{_mandir}/man8/update-crypto-policies.8*
 %{_datarootdir}/crypto-policies/python
 
 %{_bindir}/fips-mode-setup
 %{_bindir}/fips-finish-install
-%{_mandir}/man8/fips-mode-setup.8*
-%{_mandir}/man8/fips-finish-install.8*
+#%{_mandir}/man8/fips-mode-setup.8*
+#%{_mandir}/man8/fips-finish-install.8*
 
 %changelog
 * Mon Aug 15 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220815-1.git0fbe86f

@@ -428,6 +428,7 @@ mkdir build-py3
 %endif
 
 %build
+sed -i 's/ADD_SUBDIRECTORY (doc)/#ADD_SUBDIRECTORY (doc)/' CMakeLists.txt
 %if %{with python2}
 pushd build-py2
   %cmake ../ -DPYTHON_DESIRED:FILEPATH=%{__python2} -DWITHOUT_LOCAL:str=0%{?rhel}
@@ -439,7 +440,7 @@ popd
 pushd build-py3
   %cmake ../ -DPYTHON_DESIRED:FILEPATH=%{__python3} -DWITHOUT_LOCAL:str=0%{?rhel}
   %make_build
-  make doc-man
+#  make doc-man
 popd
 %endif
 
@@ -485,9 +486,9 @@ ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yum-groups-manager
 ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yumdownloader
 # These commands don't have a dedicated man page, so let's just point them
 # to the utils page which contains their descriptions.
-ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/man1/find-repos-of-install.1.gz
-ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/man1/repoquery.1.gz
-ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/man1/repotrack.1.gz
+#ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/man1/find-repos-of-install.1.gz
+#ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/man1/repoquery.1.gz
+#ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/man1/repotrack.1.gz
 %endif
 
 %check
@@ -503,28 +504,28 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %endif
 
 %files
-%{_mandir}/man8/dnf-builddep.*
-%{_mandir}/man8/dnf-changelog.*
-%{_mandir}/man8/dnf-config-manager.*
-%{_mandir}/man8/dnf-copr.*
-%{_mandir}/man8/dnf-debug.*
-%{_mandir}/man8/dnf-debuginfo-install.*
-%{_mandir}/man8/dnf-download.*
-%{_mandir}/man8/dnf-generate_completion_cache.*
-%{_mandir}/man8/dnf-groups-manager.*
-%{_mandir}/man8/dnf-needs-restarting.*
-%{_mandir}/man8/dnf-repoclosure.*
-%{_mandir}/man8/dnf-repodiff.*
-%{_mandir}/man8/dnf-repograph.*
-%{_mandir}/man8/dnf-repomanage.*
-%{_mandir}/man8/dnf-reposync.*
-%if %{with yumcompatibility}
-%{_mandir}/man1/yum-changelog.*
-%{_mandir}/man8/yum-copr.*
-%else
-%exclude %{_mandir}/man1/yum-changelog.*
-%exclude %{_mandir}/man8/yum-copr.*
-%endif
+#%{_mandir}/man8/dnf-builddep.*
+#%{_mandir}/man8/dnf-changelog.*
+#%{_mandir}/man8/dnf-config-manager.*
+#%{_mandir}/man8/dnf-copr.*
+#%{_mandir}/man8/dnf-debug.*
+#%{_mandir}/man8/dnf-debuginfo-install.*
+#%{_mandir}/man8/dnf-download.*
+#%{_mandir}/man8/dnf-generate_completion_cache.*
+#%{_mandir}/man8/dnf-groups-manager.*
+#%{_mandir}/man8/dnf-needs-restarting.*
+#%{_mandir}/man8/dnf-repoclosure.*
+#%{_mandir}/man8/dnf-repodiff.*
+#%{_mandir}/man8/dnf-repograph.*
+#%{_mandir}/man8/dnf-repomanage.*
+#%{_mandir}/man8/dnf-reposync.*
+#%if %{with yumcompatibility}
+#%{_mandir}/man1/yum-changelog.*
+#%{_mandir}/man8/yum-copr.*
+#%else
+#%exclude %{_mandir}/man1/yum-changelog.*
+#%exclude %{_mandir}/man8/yum-copr.*
+#%endif
 
 %if %{with python2}
 %files -n python2-%{name} -f %{name}.lang
@@ -613,44 +614,44 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %{_bindir}/yum-debug-restore
 %{_bindir}/yum-groups-manager
 %{_bindir}/yumdownloader
-%{_mandir}/man1/debuginfo-install.*
-%{_mandir}/man1/needs-restarting.*
-%{_mandir}/man1/repo-graph.*
-%{_mandir}/man1/repoclosure.*
-%{_mandir}/man1/repodiff.*
-%{_mandir}/man1/repomanage.*
-%{_mandir}/man1/reposync.*
-%{_mandir}/man1/yum-builddep.*
-%{_mandir}/man1/yum-config-manager.*
-%{_mandir}/man1/yum-debug-dump.*
-%{_mandir}/man1/yum-debug-restore.*
-%{_mandir}/man1/yum-groups-manager.*
-%{_mandir}/man1/yumdownloader.*
-%{_mandir}/man1/package-cleanup.*
-%{_mandir}/man1/dnf-utils.*
-%{_mandir}/man1/yum-utils.*
+#%{_mandir}/man1/debuginfo-install.*
+#%{_mandir}/man1/needs-restarting.*
+#%{_mandir}/man1/repo-graph.*
+#%{_mandir}/man1/repoclosure.*
+#%{_mandir}/man1/repodiff.*
+#%{_mandir}/man1/repomanage.*
+#%{_mandir}/man1/reposync.*
+#%{_mandir}/man1/yum-builddep.*
+#%{_mandir}/man1/yum-config-manager.*
+#%{_mandir}/man1/yum-debug-dump.*
+#%{_mandir}/man1/yum-debug-restore.*
+#%{_mandir}/man1/yum-groups-manager.*
+#%{_mandir}/man1/yumdownloader.*
+#%{_mandir}/man1/package-cleanup.*
+#%{_mandir}/man1/dnf-utils.*
+#%{_mandir}/man1/yum-utils.*
 # These are only built with yumutils bcond.
-%{_mandir}/man1/find-repos-of-install.*
-%{_mandir}/man1/repoquery.*
-%{_mandir}/man1/repotrack.*
+#%{_mandir}/man1/find-repos-of-install.*
+#%{_mandir}/man1/repoquery.*
+#%{_mandir}/man1/repotrack.*
 %else
 # These are built regardless of yumutils bcond so we need to exclude them.
-%exclude %{_mandir}/man1/debuginfo-install.*
-%exclude %{_mandir}/man1/needs-restarting.*
-%exclude %{_mandir}/man1/repo-graph.*
-%exclude %{_mandir}/man1/repoclosure.*
-%exclude %{_mandir}/man1/repodiff.*
-%exclude %{_mandir}/man1/repomanage.*
-%exclude %{_mandir}/man1/reposync.*
-%exclude %{_mandir}/man1/yum-builddep.*
-%exclude %{_mandir}/man1/yum-config-manager.*
-%exclude %{_mandir}/man1/yum-debug-dump.*
-%exclude %{_mandir}/man1/yum-debug-restore.*
-%exclude %{_mandir}/man1/yum-groups-manager.*
-%exclude %{_mandir}/man1/yumdownloader.*
-%exclude %{_mandir}/man1/package-cleanup.*
-%exclude %{_mandir}/man1/dnf-utils.*
-%exclude %{_mandir}/man1/yum-utils.*
+#%exclude %{_mandir}/man1/debuginfo-install.*
+#%exclude %{_mandir}/man1/needs-restarting.*
+#%exclude %{_mandir}/man1/repo-graph.*
+#%exclude %{_mandir}/man1/repoclosure.*
+#%exclude %{_mandir}/man1/repodiff.*
+#%exclude %{_mandir}/man1/repomanage.*
+#%exclude %{_mandir}/man1/reposync.*
+#%exclude %{_mandir}/man1/yum-builddep.*
+#%exclude %{_mandir}/man1/yum-config-manager.*
+#%exclude %{_mandir}/man1/yum-debug-dump.*
+#%exclude %{_mandir}/man1/yum-debug-restore.*
+#%exclude %{_mandir}/man1/yum-groups-manager.*
+#%exclude %{_mandir}/man1/yumdownloader.*
+#%exclude %{_mandir}/man1/package-cleanup.*
+#%exclude %{_mandir}/man1/dnf-utils.*
+#%exclude %{_mandir}/man1/yum-utils.*
 %endif
 
 %if 0%{?rhel} == 0
@@ -665,7 +666,7 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %files -n python3-dnf-plugin-leaves
 %{python3_sitelib}/dnf-plugins/leaves.*
 %{python3_sitelib}/dnf-plugins/__pycache__/leaves.*
-%{_mandir}/man8/dnf-leaves.*
+#%{_mandir}/man8/dnf-leaves.*
 %endif
 
 %else
@@ -684,7 +685,7 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %files -n python2-dnf-plugin-local
 %config(noreplace) %{_sysconfdir}/dnf/plugins/local.conf
 %{python2_sitelib}/dnf-plugins/local.*
-%{_mandir}/man8/dnf-local.*
+#%{_mandir}/man8/dnf-local.*
 %endif
 
 %if %{with python3} && 0%{?rhel} == 0
@@ -692,7 +693,7 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %config(noreplace) %{_sysconfdir}/dnf/plugins/local.conf
 %{python3_sitelib}/dnf-plugins/local.*
 %{python3_sitelib}/dnf-plugins/__pycache__/local.*
-%{_mandir}/man8/dnf-local.*
+#%{_mandir}/man8/dnf-local.*
 %endif
 
 %if %{with python2}
@@ -717,7 +718,7 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %config(noreplace) %{_sysconfdir}/dnf/plugins/post-transaction-actions.d
 %{python3_sitelib}/dnf-plugins/post-transaction-actions.*
 %{python3_sitelib}/dnf-plugins/__pycache__/post-transaction-actions.*
-%{_mandir}/man8/dnf-post-transaction-actions.*
+#%{_mandir}/man8/dnf-post-transaction-actions.*
 %endif
 
 %if 0%{?rhel} == 0
@@ -732,7 +733,7 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %files -n python3-dnf-plugin-show-leaves
 %{python3_sitelib}/dnf-plugins/show_leaves.*
 %{python3_sitelib}/dnf-plugins/__pycache__/show_leaves.*
-%{_mandir}/man8/dnf-show-leaves.*
+#%{_mandir}/man8/dnf-show-leaves.*
 %endif
 
 %else
@@ -757,8 +758,8 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %{_mandir}/man8/yum-versionlock.*
 %{_mandir}/man5/yum-versionlock.*
 %else
-%exclude %{_mandir}/man8/yum-versionlock.*
-%exclude %{_mandir}/man5/yum-versionlock.*
+#%exclude %{_mandir}/man8/yum-versionlock.*
+#%exclude %{_mandir}/man5/yum-versionlock.*
 %endif
 %endif
 
@@ -768,13 +769,13 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %config(noreplace) %{_sysconfdir}/dnf/plugins/versionlock.list
 %{python3_sitelib}/dnf-plugins/versionlock.*
 %{python3_sitelib}/dnf-plugins/__pycache__/versionlock.*
-%{_mandir}/man8/dnf-versionlock.*
+#%{_mandir}/man8/dnf-versionlock.*
 %if %{with yumcompatibility}
-%{_mandir}/man8/yum-versionlock.*
-%{_mandir}/man5/yum-versionlock.*
+#%{_mandir}/man8/yum-versionlock.*
+#%{_mandir}/man5/yum-versionlock.*
 %else
-%exclude %{_mandir}/man8/yum-versionlock.*
-%exclude %{_mandir}/man5/yum-versionlock.*
+#%exclude %{_mandir}/man8/yum-versionlock.*
+#%exclude %{_mandir}/man5/yum-versionlock.*
 %endif
 %endif
 
@@ -782,7 +783,7 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %files -n python3-dnf-plugin-modulesync
 %{python3_sitelib}/dnf-plugins/modulesync.*
 %{python3_sitelib}/dnf-plugins/__pycache__/modulesync.*
-%{_mandir}/man8/dnf-modulesync.*
+#%{_mandir}/man8/dnf-modulesync.*
 %endif
 
 %changelog

@@ -175,19 +175,21 @@ in this separate package so server systems need not install X.
 
 %build
 # Avoid rpath.
-if test -f autogen.sh; then env NOCONFIGURE=1 ./autogen.sh; else autoreconf --verbose --force --install; fi
+#if test -f autogen.sh; then env NOCONFIGURE=1 ./autogen.sh; else autoreconf --verbose --force --install; fi
+#sed -i 's/SUBDIRS=dbus bus tools test doc/SUBDIRS=dbus bus tools test/' Makefile.am
+autoreconf -fiv
 
 # Call configure here (before the extra directories for the multiple builds
 # have been created) to ensure that the hardening flag hack is applied to
 # ltmain.sh
-%configure %{dbus_common_config_opts} --enable-doxygen-docs --enable-ducktype-docs --enable-xml-docs --disable-asserts
+%configure %{dbus_common_config_opts} --disable-doxygen-docs --disable-ducktype-docs --disable-xml-docs --disable-asserts
 make distclean
 
 mkdir build
 pushd build
 # See /usr/lib/rpm/macros
 %global _configure ../configure
-%configure %{dbus_common_config_opts} --enable-doxygen-docs --enable-ducktype-docs --enable-xml-docs --disable-asserts
+%configure %{dbus_common_config_opts} --disable-doxygen-docs --disable-ducktype-docs --disable-xml-docs --disable-asserts
 make V=1 %{?_smp_mflags}
 popd
 
@@ -374,22 +376,22 @@ systemctl --no-reload --global preset dbus-daemon.service &>/dev/null || :
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc AUTHORS ChangeLog CONTRIBUTING.md NEWS README
-%exclude %{_pkgdocdir}/api
-%exclude %{_pkgdocdir}/dbus.devhelp
+#%exclude %{_pkgdocdir}/api
+#%exclude %{_pkgdocdir}/dbus.devhelp
 %exclude %{_pkgdocdir}/diagram.*
 %exclude %{_pkgdocdir}/introspect.*
 %exclude %{_pkgdocdir}/system-activation.txt
-%exclude %{_pkgdocdir}/*.html
+#%exclude %{_pkgdocdir}/*.html
 %ghost %dir /run/%{name}
 %dir %{_localstatedir}/lib/dbus/
 %{_bindir}/dbus-daemon
 %{_bindir}/dbus-cleanup-sockets
 %{_bindir}/dbus-run-session
 %{_bindir}/dbus-test-tool
-%{_mandir}/man1/dbus-cleanup-sockets.1*
-%{_mandir}/man1/dbus-daemon.1*
-%{_mandir}/man1/dbus-run-session.1*
-%{_mandir}/man1/dbus-test-tool.1*
+#%{_mandir}/man1/dbus-cleanup-sockets.1*
+#%{_mandir}/man1/dbus-daemon.1*
+#%{_mandir}/man1/dbus-run-session.1*
+#%{_mandir}/man1/dbus-test-tool.1*
 %dir %{_libexecdir}/dbus-1
 # See doc/system-activation.txt in source tarball for the rationale
 # behind these permissions
@@ -406,10 +408,10 @@ systemctl --no-reload --global preset dbus-daemon.service &>/dev/null || :
 %{_bindir}/dbus-monitor
 %{_bindir}/dbus-update-activation-environment
 %{_bindir}/dbus-uuidgen
-%{_mandir}/man1/dbus-monitor.1*
-%{_mandir}/man1/dbus-send.1*
-%{_mandir}/man1/dbus-update-activation-environment.1*
-%{_mandir}/man1/dbus-uuidgen.1*
+#%{_mandir}/man1/dbus-monitor.1*
+#%{_mandir}/man1/dbus-send.1*
+#%{_mandir}/man1/dbus-update-activation-environment.1*
+#%{_mandir}/man1/dbus-uuidgen.1*
 
 %files libs
 %{!?_licensedir:%global license %%doc}
@@ -423,7 +425,7 @@ systemctl --no-reload --global preset dbus-daemon.service &>/dev/null || :
 
 %files x11
 %{_bindir}/dbus-launch
-%{_mandir}/man1/dbus-launch.1*
+#%{_mandir}/man1/dbus-launch.1*
 %{_sysconfdir}/X11/xinit/xinitrc.d/00-start-message-bus.sh
 
 %files doc

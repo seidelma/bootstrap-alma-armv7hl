@@ -96,6 +96,8 @@ rm -rf $RPM_BUILD_ROOT
 make PKGDOCDIR=%{_pkgdocdir} DESTDIR=$RPM_BUILD_ROOT install
 mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
 install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}.conf
+rm -f ${RPM_BUILD_ROOT}/%{_datadir}/%{name}/dictionary.vim
+rm -rf ${RPM_BUILD_ROOT}/%{_datadir}/vim
 
 %description
 The BeakerLib project means to provide a library of various helpers, which
@@ -107,7 +109,7 @@ could be used when writing operating system level integration tests.
 %dir %{_pkgdocdir}
 %dir %{_pkgdocdir}/examples
 %dir %{_pkgdocdir}/examples/*
-%{_datadir}/%{name}/dictionary.vim
+#%{_datadir}/%{name}/dictionary.vim
 %{_datadir}/%{name}/*.sh
 %{_datadir}/%{name}/xslt-templates/*
 %{_bindir}/%{name}-*
@@ -115,18 +117,18 @@ could be used when writing operating system level integration tests.
 %doc %{_pkgdocdir}/*
 %config %{_tmpfilesdir}/%{name}.conf
 
-%package vim-syntax
-Summary: Files for syntax highlighting BeakerLib tests in VIM editor
-Requires: vim-common
-BuildRequires: vim-common
-BuildRequires: make
+#%package vim-syntax
+#Summary: Files for syntax highlighting BeakerLib tests in VIM editor
+#Requires: vim-common
+#BuildRequires: vim-common
+#BuildRequires: make
 
-%description vim-syntax
-Files for syntax highlighting BeakerLib tests in VIM editor
+#%description vim-syntax
+#Files for syntax highlighting BeakerLib tests in VIM editor
 
-%files vim-syntax
-%{_datadir}/vim/vimfiles/after/ftdetect/beakerlib.vim
-%{_datadir}/vim/vimfiles/after/syntax/beakerlib.vim
+#%files vim-syntax
+#%{_datadir}/vim/vimfiles/after/ftdetect/beakerlib.vim
+#%{_datadir}/vim/vimfiles/after/syntax/beakerlib.vim
 
 %changelog
 * Thu Oct 20 2022 Dalibor Pospisil <dapospis@redhat.com> - 1.29.3-1

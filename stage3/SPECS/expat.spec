@@ -42,8 +42,8 @@ sed -i 's/install-data-hook/do-nothing-please/' lib/Makefile.am
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -fPIC"
-export DOCBOOK_TO_MAN="xmlto man --skip-validation"
-%configure
+#export DOCBOOK_TO_MAN="xmlto man --skip-validation"
+%configure --without-docbook
 %make_build
 
 %install
@@ -61,7 +61,7 @@ make check
 %license COPYING
 %{_bindir}/*
 %{_libdir}/lib*.so.*
-%{_mandir}/*/*
+#%{_mandir}/*/*
 
 %files devel
 %doc doc/reference.html doc/*.css examples/*.c

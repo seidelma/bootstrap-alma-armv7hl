@@ -1,6 +1,6 @@
 # Only x86_64 and i686 are Tier 1 platforms at this time.
 # https://doc.rust-lang.org/nightly/rustc/platform-support.html
-%global rust_arches x86_64 i686 aarch64 ppc64le s390x
+%global rust_arches x86_64 i686 %{arm} aarch64 ppc64le s390x
 
 # The channel can be stable, beta, or nightly
 %{!?channel: %global channel stable}

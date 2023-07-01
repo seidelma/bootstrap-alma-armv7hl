@@ -13,7 +13,6 @@ Source2:        nss_wrapper.keyring
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gnupg2
-BuildRequires:  libcmocka-devel
 BuildRequires:  perl-generators
 
 Requires:       %{name}-libs%{?_isa} = %version-%release
@@ -55,8 +54,7 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build
-%cmake \
-  -DUNIT_TESTING=ON
+%cmake
 
 %cmake_build
 

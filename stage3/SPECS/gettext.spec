@@ -259,9 +259,15 @@ rm ${RPM_BUILD_ROOT}%{_libdir}/libgettext{src,lib}.so
 
 # move po-mode initialization elisp file to the right place, and remove byte
 # compiled file
+# hack to fix arm32 bootstrap
+install -d ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}
+touch ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.el
+touch ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.elc
 install -d ${RPM_BUILD_ROOT}%{_emacs_sitestartdir}
 mv ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.el ${RPM_BUILD_ROOT}%{_emacs_sitestartdir}
 rm ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.elc
+touch ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.el
+touch ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.elc
 
 %find_lang %{name}-runtime
 %find_lang %{name}-tools

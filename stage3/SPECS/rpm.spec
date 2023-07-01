@@ -493,7 +493,9 @@ fi
 %endif
 %{_mandir}/man8/rpm2cpio.8*
 %{_mandir}/man8/rpm-misc.8*
+%if %{with plugins}
 %{_mandir}/man8/rpm-plugins.8*
+%endif
 
 # XXX this places translated manuals to wrong package wrt eg rpmbuild
 %lang(fr) %{_mandir}/fr/man[18]/*.[18]*

@@ -112,7 +112,7 @@ pushd build-py3
       -DENABLE_DRPM=%{?with_drpm:ON}%{!?with_drpm:OFF}
   make %{?_smp_mflags} RPM_OPT_FLAGS="%{optflags}"
   # Build C documentation
-  make doc-c
+  #make doc-c
 popd
 
 %check
@@ -167,7 +167,7 @@ ln -sr %{buildroot}%{_bindir}/modifyrepo_c %{buildroot}%{_bindir}/modifyrepo
 %{_libdir}/lib%{name}.so.*
 
 %files devel
-%doc build-py3/doc/html
+#%doc build-py3/doc/html
 %{_libdir}/lib%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/

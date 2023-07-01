@@ -116,7 +116,6 @@ autoreconf --verbose --force --install
            --enable-skill \
            --enable-sigwinch \
            --enable-libselinux \
-           --with-systemd \
            --disable-modern-top\
            --enable-pidwait
 

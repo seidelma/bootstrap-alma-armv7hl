@@ -63,9 +63,13 @@ administering user and group accounts.
 %setup -qn libuser-%{version}
 
 %build
+sed -i 's/^gtkdocize/#gtkdocize/' ./autogen.sh
+sed -i '/include.*gtk-doc.make/s/^/#/' docs/reference/Makefile.am
+sed -i '/if ENABLE_GTK_DOC/,$s/^/#/g' docs/reference/Makefile.am
+sed -i 's/AC_CONFIG_FILES(\[Makefile po\/Makefile.in docs\/Makefile docs\/reference\/Makefile/AC_CONFIG_FILES(\[Makefile po\/Makefile.in/' configure.ac
+sed -i 's/SUBDIRS = po docs/SUBDIRS = po/' Makefile.am
 ./autogen.sh
 %configure --with-selinux --with-ldap --with-audit \
-           --enable-gtk-doc --with-html-dir=%{_datadir}/gtk-doc/html \
            PYTHON=%{python3}
 make
 
@@ -100,7 +104,7 @@ make
 %{_libdir}/%{name}/*.so
 %attr(0755,root,root) %{_sbindir}/*
 %{_mandir}/man1/*
-%{_mandir}/man5/*
+#%{_mandir}/man5/*
 
 %exclude %{_libdir}/*.la
 %exclude %{_libdir}/%{name}/*.la
@@ -114,7 +118,7 @@ make
 %{_includedir}/libuser
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
-%{_datadir}/gtk-doc/html/*
+#%{_datadir}/gtk-doc/html/*
 
 %changelog
 * Fri Jul 15 2022 Tomas Halman <thalman@redhat.com> - 0.63-11

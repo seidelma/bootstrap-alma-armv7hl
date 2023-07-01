@@ -16,7 +16,7 @@ Patch1:		slang-getkey-memmove.patch
 # disable test that fails with SIGHUP ignored (e.g. in koji)
 Patch2:		slang-sighuptest.patch
 BuildRequires: make
-BuildRequires:	gcc libpng-devel pcre-devel zlib-devel
+BuildRequires:	gcc pcre-devel zlib-devel
 %{?with_oniguruma:BuildRequires: oniguruma-devel}
 # static removed in 2.3.1a-3
 Obsoletes:	 slang-static < 2.3.1a-3
@@ -66,8 +66,8 @@ sed -i '/TEST_SCRIPTS_SLC = /s/array //' src/test/Makefile
 
 %build
 %configure \
-	--with-{pcre,png,z}lib=%{_libdir} \
-	--with-{pcre,png,z}inc=%{_includedir} \
+	--with-{pcre,z}lib=%{_libdir} \
+	--with-{pcre,z}inc=%{_includedir} \
 %if %{with oniguruma}
 	--with-oniglib=%{_libdir} \
 	--with-oniginc=%{_includedir} \

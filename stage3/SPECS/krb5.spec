@@ -114,7 +114,7 @@ BuildRequires: pam-devel
 BuildRequires: systemd-units
 BuildRequires: tcl-devel
 BuildRequires: libverto-devel
-BuildRequires: openldap-devel
+#BuildRequires: openldap-devel
 BuildRequires: lmdb-devel
 BuildRequires: perl-interpreter
 
@@ -295,7 +295,6 @@ CPPFLAGS="`echo $DEFINES $INCLUDES`"
     SS_LIB="-lss" \
     PKCS11_MODNAME="p11-kit-proxy.so" \
     --enable-shared \
-    --runstatedir=/run \
     --localstatedir=%{_var}/kerberos \
     --disable-rpath \
     --without-krb5-config \
@@ -304,7 +303,6 @@ CPPFLAGS="`echo $DEFINES $INCLUDES`"
     --with-netlib=-lresolv \
     --with-tcl \
     --enable-dns-for-realm \
-    --with-ldap \
     --with-dirsrv-account-locking \
     --enable-pkinit \
     --with-crypto-impl=openssl \
@@ -334,9 +332,9 @@ popd
 # Build the docs.
 make -C src/doc paths.py version.py
 cp src/doc/paths.py doc/
-mkdir -p build-man build-html
-sphinx-build -a -b man   -t pathsubs doc build-man
-sphinx-build -a -b html  -t pathsubs doc build-html
+#mkdir -p build-man build-html
+#sphinx-build -a -b man   -t pathsubs doc build-man
+#sphinx-build -a -b html  -t pathsubs doc build-html
 rm -fr build-html/_sources
 
 %if 0%{?skipcheck}
@@ -443,10 +441,10 @@ sed -r -i -e 's|^libdir=/usr/lib(64)?$|libdir=/usr/lib|g' $RPM_BUILD_ROOT%{_bind
 sed -r -i -e "s/-specs=[^ ]*//g" $RPM_BUILD_ROOT%{_bindir}/krb5-config
 
 # Install processed man pages.
-for section in 1 5 8 ; do
-    install -m 644 build-man/*.${section} \
-            $RPM_BUILD_ROOT/%{_mandir}/man${section}/
-done
+#for section in 1 5 8 ; do
+#    install -m 644 build-man/*.${section} \
+#            $RPM_BUILD_ROOT/%{_mandir}/man${section}/
+#done
 
 # I'm tired of warnings about these not having man pages
 rm -- "$RPM_BUILD_ROOT/%{_sbindir}/krb5-send-pr"
@@ -496,7 +494,7 @@ exit 0
 %files workstation
 %doc src/config-files/services.append
 %doc src/config-files/krb5.conf
-%doc build-html/*
+#%doc build-html/*
 %attr(0755,root,root) %doc src/config-files/convert-config-files
 
 # Clients of the KDC, including tools you're likely to need if you're running
@@ -587,11 +585,11 @@ exit 0
 %dir %{_libdir}/krb5
 %dir %{_libdir}/krb5/plugins
 %dir %{_libdir}/krb5/plugins/kdb
-%{_libdir}/krb5/plugins/kdb/kldap.so
-%{_libdir}/libkdb_ldap.so
-%{_libdir}/libkdb_ldap.so.*
+#%{_libdir}/krb5/plugins/kdb/kldap.so
+#%{_libdir}/libkdb_ldap.so
+#%{_libdir}/libkdb_ldap.so.*
 %{_mandir}/man8/kdb5_ldap_util.8.gz
-%{_sbindir}/kdb5_ldap_util
+#%{_sbindir}/kdb5_ldap_util
 
 %files libs -f %{gettext_domain}.lang
 %doc README NOTICE

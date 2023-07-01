@@ -67,7 +67,8 @@ awk 'stop = false; /^2014-07-27/ { stop = true; exit }; { print }' \
     %{!?with_selinux:--without-selinux} \
     --with-lzma="xz --format=lzma" \
     DEFAULT_RMT_DIR=%{_sysconfdir} \
-    RSH=/usr/bin/ssh
+    RSH=/usr/bin/ssh \
+    FORCE_UNSAFE_CONFIGURE=1
 
 %make_build
 

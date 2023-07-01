@@ -66,14 +66,14 @@ Provides:       bundled(python3dist(tempita))
 %description -n python3-Cython %{_description}
 
 
-%package -n emacs-cython-mode
-Summary:        A major mode for editing Cython source files in Emacs
-BuildArch:      noarch
-BuildRequires:  emacs
-Requires:       emacs(bin) >= %{_emacs_version}
+#%package -n emacs-cython-mode
+#Summary:        A major mode for editing Cython source files in Emacs
+#BuildArch:      noarch
+#BuildRequires:  emacs
+#Requires:       emacs(bin) >= %{_emacs_version}
 
-%description -n emacs-cython-mode
-cython-mode is an Emacs major mode for editing Cython source files.
+#%description -n emacs-cython-mode
+#cython-mode is an Emacs major mode for editing Cython source files.
 
 
 %prep
@@ -84,10 +84,10 @@ cython-mode is an Emacs major mode for editing Cython source files.
 %py3_build -- %{!?with_cython_compile:--no-cython-compile}
 
 # emacs-cython-mode build
-echo ";;
-(require 'cython-mode)" > cython-mode-init.el
-cp -p Tools/cython-mode.el .
-%{_emacs_bytecompile} *.el
+#echo ";;
+#(require 'cython-mode)" > cython-mode-init.el
+#cp -p Tools/cython-mode.el .
+#%{_emacs_bytecompile} *.el
 
 
 %install
@@ -95,10 +95,10 @@ cp -p Tools/cython-mode.el .
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 # emacs-cython-mode install
-mkdir -p %{buildroot}%{_emacs_sitelispdir}/
-cp -p cython-mode.el cython-mode.elc %{buildroot}%{_emacs_sitelispdir}/
-mkdir -p %{buildroot}%{_emacs_sitestartdir}/
-cp -p cython-mode-init.el cython-mode-init.elc %{buildroot}%{_emacs_sitestartdir}/
+#mkdir -p %{buildroot}%{_emacs_sitelispdir}/
+#cp -p cython-mode.el cython-mode.elc %{buildroot}%{_emacs_sitelispdir}/
+#mkdir -p %{buildroot}%{_emacs_sitestartdir}/
+#cp -p cython-mode-init.el cython-mode-init.elc %{buildroot}%{_emacs_sitestartdir}/
 
 
 %if %{with tests}
@@ -122,10 +122,10 @@ cp -p cython-mode-init.el cython-mode-init.elc %{buildroot}%{_emacs_sitestartdir
 %{python3_site}/pyximport/
 %pycached %{python3_site}/cython.py
 
-%files -n emacs-cython-mode
-%license LICENSE.txt
-%{_emacs_sitelispdir}/cython*.el*
-%{_emacs_sitestartdir}/cython*.el*
+#%files -n emacs-cython-mode
+#%license LICENSE.txt
+#%{_emacs_sitelispdir}/cython*.el*
+#%{_emacs_sitestartdir}/cython*.el*
 
 
 %changelog

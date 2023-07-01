@@ -82,7 +82,7 @@ autoreconf
         --without-python3 \
 %endif
         --disable-static \
-        --enable-doxygen-docs
+        --disable-doxygen-docs
 
 %make_build
 
@@ -117,7 +117,7 @@ make check|| {
 
 %files devel
 # The complex pattern below (instead of simlpy *) excludes Makefile{.am,.in}:
-%doc apidoc/html/*.{html,png,css,js}
+#%doc apidoc/html/*.{html,png,css,js}
 %{_includedir}/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*

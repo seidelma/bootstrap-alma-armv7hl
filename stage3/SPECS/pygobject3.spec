@@ -75,14 +75,14 @@ This package contains files required to embed PyGObject
 %autosetup -n pygobject-%{version} -p1
 
 %build
-%meson -Dpython=%{__python3}
+%meson -Dpycairo=disabled -Dtests=false -Dpython=%{__python3}
 %meson_build
 
 %install
 %meson_install
 
 %files -n python3-gobject
-%{python3_sitearch}/gi/_gi_cairo*.so
+#%{python3_sitearch}/gi/_gi_cairo*.so
 
 %files -n python3-gobject-base
 %dir %{python3_sitearch}/gi/

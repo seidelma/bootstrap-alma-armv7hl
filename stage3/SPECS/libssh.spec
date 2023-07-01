@@ -66,9 +66,6 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 
 %build
 %cmake \
-    -DUNIT_TESTING=ON \
-    -DCLIENT_TESTING=ON \
-    -DSERVER_TESTING=ON \
     -DGLOBAL_CLIENT_CONFIG="%{_sysconfdir}/libssh/libssh_client.config" \
     -DGLOBAL_BIND_CONFIG="%{_sysconfdir}/libssh/libssh_server.config"
 

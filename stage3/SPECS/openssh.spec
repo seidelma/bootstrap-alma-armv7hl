@@ -512,6 +512,8 @@ fi
 	--with-default-pkcs11-provider=yes \
 	--with-security-key-builtin=yes \
 	--with-pam \
+        --disable-security-key \
+	--without-xauth \
 %if %{WITH_SELINUX}
 	--with-selinux --with-audit=linux \
 	--with-sandbox=seccomp_filter \
@@ -580,6 +582,10 @@ mkdir -p -m755 $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d
 mkdir -p -m755 $RPM_BUILD_ROOT%{_libexecdir}/openssh
 %make_install
 
+install -m755 -d $RPM_BUILD_ROOT%{_mandir}/man1/
+install -m755 -d $RPM_BUILD_ROOT%{_mandir}/man5/
+install -m755 -d $RPM_BUILD_ROOT%{_mandir}/man8/
+
 install -d $RPM_BUILD_ROOT/etc/pam.d/
 install -d $RPM_BUILD_ROOT/etc/sysconfig/
 install -d $RPM_BUILD_ROOT%{_libexecdir}/openssh
@@ -600,6 +606,10 @@ install -m744 %{SOURCE13} $RPM_BUILD_ROOT/%{_libexecdir}/openssh/sshd-keygen
 install -m755 contrib/ssh-copy-id $RPM_BUILD_ROOT%{_bindir}/
 install contrib/ssh-copy-id.1 $RPM_BUILD_ROOT%{_mandir}/man1/
 install -d -m711 ${RPM_BUILD_ROOT}/%{_datadir}/empty.sshd
+
+mv $RPM_BUILD_ROOT%{_mandir}/cat1/* $RPM_BUILD_ROOT%{_mandir}/man1
+mv $RPM_BUILD_ROOT%{_mandir}/cat5/* $RPM_BUILD_ROOT%{_mandir}/man5
+mv $RPM_BUILD_ROOT%{_mandir}/cat8/* $RPM_BUILD_ROOT%{_mandir}/man8
 
 %if ! %{no_gnome_askpass}
 install contrib/gnome-ssh-askpass $RPM_BUILD_ROOT%{_libexecdir}/openssh/gnome-ssh-askpass

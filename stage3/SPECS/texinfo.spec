@@ -74,10 +74,7 @@ for printing using TeX.
 %autosetup -p1
 
 %build
-%configure --with-external-Text-Unidecode \
-           --with-external-libintl-perl \
-           --with-external-Unicode-EastAsianWidth \
-           --disable-perl-xs
+%configure --disable-perl-xs
 %make_build
 
 %install

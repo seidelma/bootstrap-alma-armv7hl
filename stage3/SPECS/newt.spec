@@ -12,9 +12,9 @@ Source: https://pagure.io/releases/newt/newt-%{version}.tar.gz
 BuildRequires: make
 BuildRequires: gcc popt-devel python3-devel slang-devel
 %{?with_python2:BuildRequires: python2-devel}
-BuildRequires: docbook-utils
+#BuildRequires: docbook-utils
 # Prefer lynx over other packages providing text-www-browser
-BuildRequires: lynx
+#BuildRequires: lynx
 
 %package devel
 Summary: Newt windowing toolkit development files
@@ -74,7 +74,7 @@ providing a python API for creating text mode interfaces.
 %configure --without-tcl
 %make_build all
 chmod 0644 peanuts.py popcorn.py
-docbook2txt tutorial.sgml
+#docbook2txt tutorial.sgml
 
 %install
 %make_install
@@ -91,7 +91,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libnewt.a
 %{_mandir}/man1/whiptail.1*
 
 %files devel
-%doc tutorial.*
+#%doc tutorial.*
 %{_includedir}/newt.h
 %{_libdir}/libnewt.so
 %{_libdir}/pkgconfig/libnewt.pc

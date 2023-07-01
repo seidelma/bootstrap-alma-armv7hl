@@ -21,7 +21,7 @@ Patch1:         lmdb-s390-check.patch
 
 BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:  doxygen
+#BuildRequires:  doxygen
 
 %description
 LMDB is an ultra-fast, ultra-compact key-value embedded data
@@ -62,7 +62,7 @@ pushd %{archive_path}
 %set_build_flags
 %make_build XCFLAGS="%{build_cflags}"
 # Build doxygen documentation
-doxygen
+#doxygen
 # remove unpackaged files
 rm -f Doxyfile
 rm -rf man # Doxygen generated manpages
@@ -115,7 +115,7 @@ popd
 %{_libdir}/pkgconfig/*.pc
 
 %files doc
-%doc %{archive_path}/html
+#%doc %{archive_path}/html
 %doc %{archive_path}/COPYRIGHT
 %doc %{archive_path}/CHANGES
 %license %{archive_path}/LICENSE

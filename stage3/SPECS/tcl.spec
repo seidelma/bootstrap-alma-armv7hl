@@ -1,6 +1,5 @@
 %define majorver 8.6
 %define	vers %{majorver}.10
-%{!?sdt:%define sdt 1}
 
 Summary: Tool Command Language, pronounced tickle
 Name: tcl
@@ -21,10 +20,6 @@ Patch0: tcl-8.6.10-autopath.patch
 Patch1: tcl-8.6.10-conf.patch
 Patch2: tcl-8.6.10-hidden.patch
 Patch3: tcl-8.6.10-tcltests-path-fix.patch
-
-%if %sdt
-BuildRequires: systemtap-sdt-devel
-%endif
 
 %description
 The Tcl (Tool Command Language) provides a powerful platform for
@@ -72,9 +67,6 @@ chmod -x generic/tclStrToD.c
 pushd unix
 autoconf
 %configure \
-%if %sdt
---enable-dtrace \
-%endif
 --enable-threads \
 --enable-symbols \
 --enable-shared

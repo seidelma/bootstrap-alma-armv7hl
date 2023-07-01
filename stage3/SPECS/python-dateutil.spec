@@ -53,7 +53,7 @@ mv NEWS.new NEWS
 
 %build
 %py3_build
-make -C docs html
+#make -C docs html
 
 %install
 %py3_install
@@ -71,7 +71,7 @@ make -C docs html
 
 %files doc
 %license LICENSE
-%doc docs/_build/html
+#%doc docs/_build/html
 
 %changelog
 * Tue Aug 10 2021 Mohan Boddu <mboddu@redhat.com> - 1:2.8.1-6

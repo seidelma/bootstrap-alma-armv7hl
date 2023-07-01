@@ -70,7 +70,7 @@ cd build
 rm -f %{buildroot}%{_infodir}/dir
 
 # remove installed HTML documentation
-rm -f %{buildroot}%{_docdir}/nano/{nano,nano.1,nanorc.5,rnano.1}.html
+rm -f %{buildroot}%{_docdir}/nano/{faq,nano,nano.1,nanorc.5,rnano.1}.html
 
 # install default /etc/nanorc
 mkdir -p %{buildroot}%{_sysconfdir}

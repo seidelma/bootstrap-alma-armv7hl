@@ -207,16 +207,17 @@ git commit --all --amend --no-edit > /dev/null
 %build
 # NOTE: The re-generating of ./configure (below) should be removed once the
 #       direct dependency on 'aclocal-1.15' is fixed in upstream and backported.
+sed -i 's/SUBDIRS += extras doc awklib po test/SUBDIRS += extras awklib po test/' Makefile.am
 autoreconf --force --verbose
 
 %configure
 %make_build
 
 # Build the documentation in PDF, postscript and HTML versions:
-%make_build -C doc pdf
-mkdir -p html/gawk html/gawkinet
-makeinfo --html -I doc -o html/gawk     doc/gawk.texi
-makeinfo --html -I doc -o html/gawkinet doc/gawkinet.texi
+#%make_build -C doc pdf
+#mkdir -p html/gawk html/gawkinet
+#makeinfo --html -I doc -o html/gawk     doc/gawk.texi
+#makeinfo --html -I doc -o html/gawkinet doc/gawkinet.texi
 
 # ---------------
 
@@ -236,7 +237,7 @@ rm -f %{buildroot}%{_infodir}/dir
 
 # Create additional symlinks:
 ln -sf gawk %{buildroot}%{_bindir}/awk
-ln -sf gawk.1.gz %{buildroot}%{_mandir}/man1/awk.1.gz
+#ln -sf gawk.1.gz %{buildroot}%{_mandir}/man1/awk.1.gz
 
 ln -sf /usr/share/awk   %{buildroot}%{_datadir}/gawk
 ln -sf /usr/libexec/awk %{buildroot}%{_libexecdir}/gawk
@@ -248,11 +249,11 @@ ln -sf /usr/libexec/awk %{buildroot}%{_libexecdir}/gawk
 install -m 0755 -d %{buildroot}%{_docdir}/%{name}/html/gawk/
 install -m 0755 -d %{buildroot}%{_docdir}/%{name}/html/gawkinet/
 
-install -m 0644 -p html/gawk/*           %{buildroot}%{_docdir}/%{name}/html/gawk/
-install -m 0644 -p html/gawkinet/*       %{buildroot}%{_docdir}/%{name}/html/gawkinet/
+#install -m 0644 -p html/gawk/*           %{buildroot}%{_docdir}/%{name}/html/gawk/
+#install -m 0644 -p html/gawkinet/*       %{buildroot}%{_docdir}/%{name}/html/gawkinet/
 
-install -m 0644 -p doc/gawk.{pdf,ps}     %{buildroot}%{_docdir}/%{name}
-install -m 0644 -p doc/gawkinet.{pdf,ps} %{buildroot}%{_docdir}/%{name}
+#install -m 0644 -p doc/gawk.{pdf,ps}     %{buildroot}%{_docdir}/%{name}
+#install -m 0644 -p doc/gawkinet.{pdf,ps} %{buildroot}%{_docdir}/%{name}
 
 # === PACKAGING INSTRUCTIONS ==================================================
 
@@ -264,9 +265,9 @@ install -m 0644 -p doc/gawkinet.{pdf,ps} %{buildroot}%{_docdir}/%{name}
 %{_libexecdir}/*awk
 %{_sysconfdir}/profile.d/gawk.*
 
-%{_mandir}/man1/*
+#%{_mandir}/man1/*
 %{_mandir}/man3/*
-%{_infodir}/*awk*.info*
+#%{_infodir}/*awk*.info*
 
 %doc NEWS README POSIX.STD README_d/README.multibyte
 %license COPYING LICENSE.GPLv2 LICENSE.LGPLv2 LICENSE.BSD
@@ -282,9 +283,9 @@ install -m 0644 -p doc/gawkinet.{pdf,ps} %{buildroot}%{_docdir}/%{name}
 
 # NOTE: For some reason, adding all files in one line causes RPM build to fail.
 %files doc
-%doc %{_docdir}/%{name}/gawk.{pdf,ps}
-%doc %{_docdir}/%{name}/gawkinet.{pdf,ps}
-%doc %{_docdir}/%{name}/html
+#%doc %{_docdir}/%{name}/gawk.{pdf,ps}
+#%doc %{_docdir}/%{name}/gawkinet.{pdf,ps}
+#%doc %{_docdir}/%{name}/html
 
 # =============================================================================
 

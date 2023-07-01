@@ -127,8 +127,8 @@ Development files for %{name}.
     -Drpmio=enabled \
     -Dskip_introspection=false \
     -Dtest_installed_lib=false \
-    -Dwith_docs=true \
-    -Dwith_manpages=enabled \
+    -Dwith_docs=false \
+    -Dwith_manpages=disabled \
     %{meson_python_flags}
 %meson_build
 
@@ -141,6 +141,8 @@ export LC_CTYPE=C.utf8
 
 %install
 %meson_install
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/gtk-doc/html/modulemd-2.0
 
 %if ( 0%{?rhel} && 0%{?rhel} <= 7)
 # Don't conflict with modulemd-validator from 1.x included in the official
@@ -160,7 +162,7 @@ mv %{buildroot}%{_mandir}/man1/modulemd-validator.1 \
 %license COPYING
 %doc NEWS README.md
 %{_bindir}/modulemd-validator%{?v2_suffix}
-%{_mandir}/man1/modulemd-validator%{?v2_suffix}.1*
+#%{_mandir}/man1/modulemd-validator%{?v2_suffix}.1*
 %{_libdir}/%{upstream_name}.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/Modulemd-2.0.typelib

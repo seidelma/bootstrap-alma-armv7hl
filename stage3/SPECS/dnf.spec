@@ -203,7 +203,18 @@ mkdir build-py3
 pushd build-py3
 %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python3} -DDNF_VERSION=%{version}
 %make_build
-make doc-man
+# HACK: disable docs in stage3 bootstrap and add dummy manpage files so cmake behaves
+# make doc-man
+touch doc/dnf.8
+touch doc/dnf-automatic.8
+touch doc/yum2dnf.8
+touch doc/yum.8
+touch doc/yum-shell.8
+touch doc/dnf.conf.5
+touch doc/yum.conf.5
+touch doc/dnf-transaction-json.5
+touch doc/yum-aliases.1
+touch doc/dnf.modularity.7
 popd
 
 %install
