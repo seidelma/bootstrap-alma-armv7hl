@@ -159,7 +159,7 @@ BuildRequires:  rhash-devel
 %endif
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-BuildRequires:  vim-filesystem
+#BuildRequires:  vim-filesystem
 %endif
 %if %{with emacs}
 BuildRequires:  emacs
@@ -227,7 +227,7 @@ Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       emacs-filesystem%{?_emacs_version: >= %{_emacs_version}}
 %endif
 %endif
-Requires:       vim-filesystem
+#Requires:       vim-filesystem
 
 BuildArch:      noarch
 
