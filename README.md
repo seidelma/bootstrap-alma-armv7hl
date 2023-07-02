@@ -17,14 +17,22 @@ If (like me) you're doing this on a Raspberry Pi, you might want to consider:
  - tuning some of the settings, especially parallel make jobs, in `common.rc`. On a RPi 3, running 4 jobs (one for each processor) will cause OOM errors and run the processor really hot.
 
 ## Process
-`stage1.sh` bootstraps a minimal development environment from the AlmaLinux source RPMs, making it possible to `chroot` into the new environment and run `stage2.sh`.
-`stage2.sh` takes the minimal environment and leaves it in a state capable of running `rpm` and `rpmbuild`.
-`stage3.sh` uses `rpm` and `rpmbuild` to build and install packages required to run `mock`, with which all the rest of the system can be (re)built.
+ - `stage1.sh` bootstraps a minimal development environment from the AlmaLinux source RPMs, making it possible to `chroot` into the new environment and run `stage2.sh`.
+ - `stage2.sh` takes the minimal environment and leaves it in a state capable of running `rpm` and `rpmbuild`.
+ - `stage3.sh` uses `rpm` and `rpmbuild` to build and install packages required to run `mock`, with which all the rest of the system can be (re)built.
+ - `stage4.sh` uses `mock` to rebuild the entire distribution.
+ - The (planned, not yet implemented) stage5 is just another pass of stage4, but with stage3 removed so the system is self-hosting.
 
 ## Howto
-1. Download the AlmaLinux source RPMs to your local machine. Copy all the SRPMs to one directory, or link them with something like `mkdir all_pkgs; for pkg in repos/*/Packages; do ln -sv ../$pkg all_pkgs; done`. Edit `stage1.sh` as necessary with the location and versions of the SRPMs, and specify INSTALL_DIR in it to set the install location of the bootstrap environment.
+1. Download the AlmaLinux source RPMs to your local machine. Copy all the SRPMs to one directory, or link them with something like `mkdir all_pkgs; for pkg in repos/*/Packages; do ln -sv ../$pkg all_pkgs; done`. Edit `common.rc` as necessary.
+1. Ensure you have the prerequisite packages installed using `install_prereqs_deb.sh` or `install_prereqs_rpm.sh`, depending on the package manager on your system.
+1. Run `stage1_prep.sh` as a non-root user. This will create the chroot directory (or clean any files in it if it exists!), and install kernel headers from the Alma distribution into it for stage1.
 2. Run `stage1.sh` as a non-root user. This will build the chroot environment.
-3. Run `stage2_prep_chroot.sh`, which will create users, mountpoints, etc. in the chroot directory. Then run `stage2_prep_packages.sh` to copy packages and the build scripts into it.
-3. As the root user, do `chroot $INSTALL_DIR /bin/bash` to be placed into the new system.
-4. Run `stage2.sh` from the chroot environment to continue building packages required for `rpm` and `rpmbuild`.
-5. Run `stage3.sh` from the chroot environment to build the packages required to run `mock`.
+2. Run `stage2_prep_chroot.sh`, which will create users, mountpoints, etc. in the chroot directory. This requires `sudo` privileges for `install`, `mount`, and `chroot`. 
+2. Run `stage2_prep_packages.sh` to copy packages and the build scripts into the chroot.
+2. As the root user, do `chroot $INSTALL_DIR /bin/bash` to start a root shell in the chroot directory.
+2. Run `stage2.sh` from the chroot environment to continue building packages required for `rpm` and `rpmbuild`.
+3. Run `stage3_prep_chroot.sh`. This will copy the Java environment and CA certificates from the host (needed for building some stage3 packages), mount the source tree and the destination directory for stage3 RPMs in the chroot, and create some files required for stage3.
+3. Run `stage3.sh` from the chroot environment to build the packages required to run `mock`.
+4. Run `stage4_prep_chroot.sh`, which remounts the stage3 RPM directory read-only, and mounts the stage4 RPM directory.
+4. Run `stage4.sh` to build the rest of the system with `mock`.
