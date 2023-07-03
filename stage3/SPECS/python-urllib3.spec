@@ -27,7 +27,7 @@ BuildRequires:  python3-setuptools
 %if %{with tests}
 BuildRequires:  python3-dateutil
 BuildRequires:  python3-six
-BuildRequires:  python3-pysocks
+#BuildRequires:  python3-pysocks
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-freezegun
 BuildRequires:  python3-pytest-timeout
@@ -39,7 +39,7 @@ BuildRequires:  python3-idna
 Requires:       ca-certificates
 Requires:       python3-idna
 Requires:       python3-six
-Requires:       python3-pysocks
+#Requires:       python3-pysocks
 
 %description -n python3-%{srcname}
 Python3 HTTP module with connection pooling and file POST abilities.
