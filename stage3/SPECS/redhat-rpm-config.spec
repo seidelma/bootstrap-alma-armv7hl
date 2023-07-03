@@ -89,10 +89,20 @@ BuildArch: noarch
 BuildRequires: perl-generators
 Requires: coreutils
 
+#Requires: efi-srpm-macros
+#Requires: fonts-srpm-macros
+#Requires: ghc-srpm-macros
+#Requires: go-srpm-macros
 # ↓ Provides kmod.attr originally shipped by us
+#Requires: kernel-srpm-macros >= 1.0-6
+#Requires: lua-srpm-macros
+#Requires: ocaml-srpm-macros
+#Requires: openblas-srpm-macros
 Requires: perl-srpm-macros
 # ↓ Provides compileall2 Python module
 Requires: python-srpm-macros >= 3-46
+#Requires: qt5-srpm-macros
+#Requires: rust-srpm-macros
 
 %if ! 0%{?rhel}
 Requires: fpc-srpm-macros
