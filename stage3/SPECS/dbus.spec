@@ -82,7 +82,7 @@ BuildRequires: /usr/bin/Xvfb
 BuildRequires: make
 
 # Since F30 the default implementation is dbus-broker over dbus-daemon
-Requires: dbus-broker >= 16-4
+#Requires: dbus-broker >= 16-4
 
 %description
 D-BUS is a system for sending messages between applications. It is
