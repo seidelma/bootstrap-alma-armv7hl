@@ -1,3 +1,7 @@
+# We shouldn't need to use any custom specfiles yet
+#  but this must be defined for all stages
+STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage1/SPECS"
+
 # Packages, in (rough) dependency order
 STAGE1_PACKAGES=("BINUTILS_PHASE1" "GMP" "MPC" "MPFR" "GCC_PHASE1" 
  "GLIBC" "LIBSTDCXX" "M4" "NCURSES" "BASH" "COREUTILS" "DIFFUTILS" 
@@ -85,7 +89,7 @@ GCC_PHASE1_CONFIGURE='../configure
     --with-gcc-major-version-only
     --with-newlib
     --with-float=hard
-    --with-fpu=neon
+    --with-fpu=vfpv3-d16
     --without-headers
     --disable-nls
     --disable-shared
@@ -120,7 +124,7 @@ GCC_PHASE2_CONFIGURE='../configure
     --with-build-sysroot=${INSTALL_DIR}
     --with-gcc-major-version-only
     --with-float=hard
-    --with-fpu=neon
+    --with-fpu=vfpv3-d16
     --enable-initfini-array
     --disable-nls
     --disable-multilib
@@ -162,7 +166,7 @@ LIBSTDCXX_POST_MAKE_CMD='rm -v ${INSTALL_DIR}/usr/lib/lib{stdc++,stdc++fs,supc++
 
 GLIBC_VERSION='2.34'
 GLIBC_SRC_DIR='${SRC_DIR}/glibc-${GLIBC_VERSION}'
-GLIBC_CONFIGURE='CC="armv7hl-redhat-linux-gnueabi-gcc -march=armv7-a -mtune=generic-armv7-a -mfpu=neon -mfloat-abi=hard" ../configure
+GLIBC_CONFIGURE='CC="armv7hl-redhat-linux-gnueabi-gcc -march=armv7-a -mtune=generic-armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard" ../configure
     --prefix=/usr
     --host=${TARGET_TRIPLET}
     --build=$(../scripts/config.guess)
