@@ -2,6 +2,8 @@
 INSTALL_DIR="/target"
 STAGE12_PACKAGESRCFILE="${SCRIPT_DIR}/stage12_packages.rc"
 STAGE3_PACKAGESRCFILE="${SCRIPT_DIR}/stage3_packages.rc"
+STAGE4_PACKAGESRCFILE="${SCRIPT_DIR}/stage4_packages.rc"
+
 PHASE1_TOOLS_DIR="p1" # Relative to $INSTALL_DIR
 TARGET_TRIPLET="armv7hl-redhat-linux-gnueabi"
 SRPM_REPO_FSLABEL="LABEL=src"
@@ -11,7 +13,6 @@ SRPM_REPO_DIR="${SRPM_REPO_MPOINT}/all"
 STAGE3_REPO_FSLABEL="LABEL=stage3"
 STAGE3_REPO_MPOINT="/mnt/alma/stage3"
 STAGE3_REPO_DIR="${STAGE3_REPO_MPOINT}/rpms"
-STAGE3_SPECFILE_DIR="${SCRIPT_DIR}/stage3/SPECS"
 
 STAGE4_REPO_FSLABEL="LABEL=stage4"
 STAGE4_REPO_MPOINT="/mnt/alma/mock-stage4"
@@ -110,8 +111,8 @@ do_rpmbuild_bb () {
 prep_for_rpmbuild () {
 	get_srpm_package "$1"
 	do_rpm_install "$package"
-	if [ -f "${STAGE3_SPECFILE_DIR}/${pkgname_lower}.spec" ]; then
-		cp "${STAGE3_SPECFILE_DIR}/${pkgname_lower}.spec" "${RPMBUILD_TOPDIR}/SPECS"
+	if [ -f "${STAGE_SPECFILE_DIR}/${pkgname_lower}.spec" ]; then
+		cp "${STAGE_SPECFILE_DIR}/${pkgname_lower}.spec" "${RPMBUILD_TOPDIR}/SPECS"
 	fi
 	if [ "xx${pre_rpmbuild_cmd}" != "xx" ]; then
 		eval "$pre_rpmbuild_cmd"
@@ -212,4 +213,34 @@ copy_source_to_chroot () {
 	fi
 	
 	unset name_tmp pcopy_tmp pcopy_cmd ocopy_tmp ocopy_cmd
+}
+
+mock_build () {
+	# TODO: Some packages require extra mock build options;
+	# eg lots of python packages require
+	#   --additional-package=pyproject-rpm-macros
+	# Haven't decided how to handle that yet but this seems
+	# like a good place to start.
+	if mock --rebuild "$1" ${mock_build_opts:-}; then
+		for file in $(find "${MOCK_RESULT_DIR}" -name "*rpm" -a -not -name "*src.rpm"); do
+			cp -av "$file" "$STAGE4_REPO_DIR"
+		done
+		return 0
+	else
+		return 1
+	fi
+}
+
+mock_rebuild_srpm_from_specfile () {
+	# Some package specfiles as shipped from Red Hat are broken for armv7hl
+	# (eg, redhat-rpm-config depends on go-srpm-macros,
+	#  but ARM is excluded from Red Hat's golang specfile)
+	# Rebuild the given srpm with the fixed specfile in the stage4/SPECS
+	#  directory and overwrite the original srpm so mock can build it later
+        get_package_name
+        set_package_vars
+	prep_for_rpmbuild "${pkgname_lower}-${pkg_version}"
+	mock --buildsrpm --spec "${RPMBUILD_TOPDIR}/SPECS/${pkgname_lower}.spec" --sources "${RPMBUILD_TOPDIR}/SOURCES"
+	# $package is set by prep_for_rpmbuild
+	cp -afv "${MOCK_RESULT_DIR}/${package}" "${SRPM_REPO_DIR}"
 }
