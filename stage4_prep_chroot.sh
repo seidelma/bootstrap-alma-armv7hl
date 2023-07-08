@@ -10,10 +10,10 @@ else
         echo "The script config file $CONFIGRCFILE was not found, exiting"
         exit 1
 fi
-if [ -f "$STAGE3_PACKAGESRCFILE" ]; then
-    . "$STAGE3_PACKAGESRCFILE"
+if [ -f "$STAGE4_PACKAGESRCFILE" ]; then
+    . "$STAGE4_PACKAGESRCFILE"
 else
-    echo "The package config file $STAGE3_PACKAGESRCFILE was not found; exiting"
+    echo "The package config file $STAGE4_PACKAGESRCFILE was not found; exiting"
     exit 1
 fi
 
@@ -23,6 +23,8 @@ if [ ! -f /.in_chroot ]; then
 	echo "And then rerun it"
 	exit 1
 fi
+
+STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage4/SPECS"
 
 # Create a repository from the stage3 packages we built
 createrepo $STAGE3_REPO_DIR
@@ -46,4 +48,23 @@ else
 	mount "$STAGE4_REPO_FSLABEL" "$STAGE4_REPO_MPOINT"
 fi
 [ ! -d "$STAGE4_REPO_DIR" ] && mkdir -pv "$STAGE4_REPO_DIR"
-createrepo $STAGE4_REPO_DIR
+createrepo "$STAGE4_REPO_DIR"
+
+# Rebuild RPM macros packages because they are turned off
+# in stage3 redhat-rpm-config. If that is built before any
+# of these it causes all subsequent builds to fail
+for pkg in "${SRPM_REPO_DIR}"/{efi,epel,fonts,ghc,kernel,lua,ocaml,openblas,perl,pyproject,python,R,rust}*rpm-macros*; do
+    if mock_build "$pkg"; then
+        echo "$pkg finished succesfully"
+    else
+        echo "$pkg failed"
+    fi
+done
+createrepo "$STAGE4_REPO_DIR"
+
+mount -o remount,rw "$SRPM_REPO_MPOINT"
+for pkg in "$SRPM_REBUILD_PACKAGES"; do
+    mock_rebuild_srpm_from_specfile "$pkg"
+done
+mount -o remount,ro "$SRPM_REPO_MPOINT"
+
