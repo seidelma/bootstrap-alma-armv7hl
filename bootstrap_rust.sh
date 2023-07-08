@@ -179,8 +179,9 @@ do
 	do_rpmbuild_and_install ${pkgname_lower}-${pkg_version} ${pkgname_lower}.spec
 done
 
-PATH=$OLDPATH
-LD_LIBRARY_PATH=$OLDLDPATH
+PATH="$OLDPATH"
+LD_LIBRARY_PATH="$OLDLDPATH"
+INSTALL_PREFIX="/usr"
 export PATH LD_LIBRARY_PATH
 
 for pkg in "RUST"
