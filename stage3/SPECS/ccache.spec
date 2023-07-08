@@ -24,11 +24,11 @@ Source2:        %{name}.csh.in
 
 BuildRequires:  /usr/bin/asciidoctor
 BuildRequires:  cmake
-BuildRequires:  hiredis-devel
+#BuildRequires:  hiredis-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  perl perl(File::Spec)
 # clang for additional tests
-BuildRequires:  clang clang-tools-extra
+#BuildRequires:  clang clang-tools-extra
 # coreutils for triggerin, triggerpostun
 Requires:       coreutils
 # For groupadd
