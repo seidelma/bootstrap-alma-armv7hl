@@ -242,5 +242,7 @@ mock_rebuild_srpm_from_specfile () {
 	prep_for_rpmbuild "${pkgname_lower}-${pkg_version}"
 	mock --buildsrpm --spec "${RPMBUILD_TOPDIR}/SPECS/${pkgname_lower}.spec" --sources "${RPMBUILD_TOPDIR}/SOURCES"
 	# $package is set by prep_for_rpmbuild
-	cp -afv "${MOCK_RESULT_DIR}/${package}" "${SRPM_REPO_DIR}"
+	pkg_basename="$(basename $package)"
+	cp -afv "${MOCK_RESULT_DIR}/${pkg_basename}" "${SRPM_REPO_DIR}"
+	unset pkg_basename
 }
