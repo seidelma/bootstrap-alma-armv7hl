@@ -108,7 +108,7 @@ BuildRequires:	perl-generators
 BuildRequires:	ncurses-devel
 # According to https://fedoraproject.org/wiki/Packaging:Emacs a package
 # should BuildRequires: emacs if it packages emacs integration files.
-BuildRequires:	emacs
+# BuildRequires:	emacs
 
 # The testsuite uses /usr/bin/lit which is part of the python3-lit package.
 BuildRequires:	python3-lit
@@ -225,7 +225,7 @@ intended to run in tandem with a build of a project or code base.
 %package tools-extra
 Summary:	Extra tools for clang
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:	emacs-filesystem
+#Requires:	emacs-filesystem
 
 %description tools-extra
 A set of extra tools built using Clang's tooling API.
