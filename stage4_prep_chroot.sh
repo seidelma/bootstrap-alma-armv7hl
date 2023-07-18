@@ -27,7 +27,8 @@ fi
 STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage4/SPECS"
 
 # Create a repository from the stage3 packages we built
-createrepo $STAGE3_REPO_DIR
+mount -o remount,rw "$STAGE3_REPO_MPOINT"
+createrepo "$STAGE3_REPO_DIR"
 
 cp -av "$CHROOT_SCRIPT_DIR"/stage4/etc/mock/* /etc/mock
 ln -sf /etc/mock/almalinux-9-armv7hl.cfg /etc/mock/default.cfg
@@ -53,7 +54,7 @@ createrepo "$STAGE4_REPO_DIR"
 # Rebuild RPM macros packages because they are turned off
 # in stage3 redhat-rpm-config. If that is built before any
 # of these it causes all subsequent builds to fail
-for pkg in "${SRPM_REPO_DIR}"/{efi,epel,fonts,ghc,kernel,lua,ocaml,openblas,perl,pyproject,python,R,rust}*rpm-macros*; do
+for pkg in "${SRPM_REPO_DIR}"/{efi,epel,fonts,ghc,go,kernel,lua,ocaml,openblas,perl,pyproject,python,R,rust}*rpm-macros*; do
     if mock_build "$pkg"; then
         echo "$pkg finished succesfully"
     else
