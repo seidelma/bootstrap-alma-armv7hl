@@ -26,17 +26,39 @@ fi
 
 STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage4/SPECS"
 
-pkg_sucs=0
-pkg_fail=0
+pkg_sucs=()
+pkg_fail=()
 for pkg in $(python ${SCRIPT_DIR}/get_buildable_packages.py); do
     mock_build_opts="--additional-package=pyproject-rpm-macros"
+    pkgfile="$(basename $pkg)"
     if mock_build "$pkg"; then
         createrepo "$STAGE4_REPO_DIR"
-        let "pkg_sucs=$pkg_sucs+1"
-        echo "$pkg_sucs packages completed successfully"
+        pkg_sucs+=($pkgfile)
+        echo "Building package $pkgfile succeeded"
     else
-        let "pkg_fail=$pkg_fail+1"
-        echo "Building package $pkg failed; continuing"
+        pkg_fail+=($pkgfile)
+        echo "Building package $pkgfile failed; continuing"
     fi
-    echo "$pkg_sucs successes, $pkg_fail failures so far"
+    echo "${#pkg_sucs[@]} successes, ${#pkg_fail[@]} failures so far"
 done
+
+printf "%-40.40s\t%40.40s" "Succeeded Packages" "Failed Packages"
+if [ "${#pkg_sucs[@]}" -ge "${#pkg_fail[@]}" ]; then
+    j="${#pkg_fail[@]}"
+    for i in "${!pkg_sucs[@]}"; do
+        if [ "$i" -le "$j" ]; then
+            printf "%-40.40s\t%40.40s" "${pkg_sucs[$i]}" "${pkg_fail[$i]}"
+        else
+            printf "%-40.40s" "${pkg_sucs[$i]}"
+        fi
+    done
+else
+    j="${#pkg_sucs[@]}"
+    for i in "${!pkg_fail[@]}"; do
+        if [ "$i" -le "$j" ]; then
+            printf "%-40.40s\t%40.40s" "${pkg_sucs[$i]}" "${pkg_fail[$i]}"
+        else
+            printf "%-40.40s\t%40.40s" "" "${pkg_fail[$i]}"
+        fi
+    done
+fi
