@@ -25,6 +25,7 @@ if [ ! -f /.in_chroot ]; then
 fi
 
 STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage4/SPECS"
+STAGE_REPO_DIR="$STAGE4_REPO_DIR"
 
 # Create a repository from the stage3 packages we built
 mount -o remount,rw "$STAGE3_REPO_MPOINT"

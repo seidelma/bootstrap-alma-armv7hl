@@ -141,7 +141,7 @@ copy_rpms_to_repo () {
 		i=1
         done
 	for file in $(find "${RPMBUILD_TOPDIR}/RPMS" -type f $incs $excs); do
-		cp -v "$file" "${STAGE3_REPO_DIR}"
+		cp -v "$file" "${STAGE_REPO_DIR}"
 	done
 }
 
@@ -150,7 +150,7 @@ do_rpmbuild_and_install () {
 	do_rpmbuild_bb "${RPMBUILD_TOPDIR}/SPECS/$2"
 	copy_rpms_to_repo
 	for iglob in $install_packages; do
-		do_rpm_install "${STAGE3_REPO_DIR}/$iglob"
+		do_rpm_install "${STAGE_REPO_DIR}/$iglob"
 	done
 	rm -rf $RPMBUILD_TOPDIR/RPMS
 }
@@ -223,7 +223,7 @@ mock_build () {
 	# like a good place to start.
 	if mock --rebuild "$1" ${mock_build_opts:-}; then
 		for file in $(find "${MOCK_RESULT_DIR}" -name "*rpm" -a -not -name "*src.rpm"); do
-			cp -av "$file" "$STAGE4_REPO_DIR"
+			cp -av "$file" "$STAGE_REPO_DIR"
 		done
 		return 0
 	else

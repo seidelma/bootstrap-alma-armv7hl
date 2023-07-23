@@ -25,6 +25,7 @@ if [ ! -f /.in_chroot ]; then
 fi
 
 STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage4/SPECS"
+STAGE_REPO_DIR="$STAGE4_REPO_DIR"
 
 pkg_sucs=()
 pkg_fail=()
@@ -32,7 +33,7 @@ for pkg in $(python ${SCRIPT_DIR}/get_buildable_packages.py); do
     mock_build_opts="--additional-package=pyproject-rpm-macros"
     pkgfile="$(basename $pkg)"
     if mock_build "$pkg"; then
-        createrepo "$STAGE4_REPO_DIR"
+        createrepo "$STAGE_REPO_DIR"
         pkg_sucs+=($pkgfile)
         echo "Building package $pkgfile succeeded"
     else

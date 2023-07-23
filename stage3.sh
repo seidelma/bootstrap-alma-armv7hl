@@ -29,6 +29,7 @@ export LC_ALL=POSIX
 PATH=/usr/bin:/usr/sbin
 
 STAGE_SPECFILE_DIR="${SCRIPT_DIR}/stage3/SPECS"
+STAGE_REPO_DIR="$STAGE3_REPO_DIR"
 
 stage3_setup () {
 	cp $SCRIPT_DIR/stage3/rpmmacros ~/.rpmmacros
